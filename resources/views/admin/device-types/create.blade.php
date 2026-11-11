@@ -1,16 +1,17 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('content')
-    <x-page-header title="ثبت نوع دستگاه" />
+    <x-page-header title="ثبت نوع دستگاه" subtitle="نوع دستگاه را برای طبقه‌بندی تعریف کنید." />
 
-    <x-card>
-        <form method="POST" action="{{ route('admin.device-types.store') }}" class="space-y-4">
-            @csrf
+    <form method="POST" action="{{ route('admin.device-types.store') }}">
+        @csrf
+        <x-form-shell kicker="کاتالوگ" title="ثبت نوع دستگاه" subtitle="نوع دستگاه را برای طبقه‌بندی تعریف کنید.">
             @include('admin.device-types._form', ['deviceType' => null])
-            <div class="flex gap-2">
-                <x-button>ثبت نوع دستگاه</x-button>
+
+            <x-slot:actions>
+                <x-button>ثبت</x-button>
                 <x-button variant="secondary" href="{{ route('admin.device-types.index') }}">بازگشت</x-button>
-            </div>
-        </form>
-    </x-card>
+            </x-slot:actions>
+        </x-form-shell>
+    </form>
 @endsection

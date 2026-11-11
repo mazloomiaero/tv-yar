@@ -81,12 +81,12 @@
 
     @include('service-requests._assign')
 
-    <div class="mt-6 space-y-4">
+    <div class="mt-4 space-y-4">
         @can('changeStatus', $serviceRequest)
-            <x-card title="تغییر وضعیت">
-                <form method="POST" action="{{ \App\Support\OpsRoute::to('service-requests.status', $serviceRequest) }}" class="flex flex-col gap-3 sm:flex-row sm:items-end">
-                    @csrf
-                    <div class="flex-1">
+            <form method="POST" action="{{ \App\Support\OpsRoute::to('service-requests.status', $serviceRequest) }}">
+                @csrf
+                <x-form-shell kicker="وضعیت" title="تغییر وضعیت" subtitle="وضعیت فعلی درخواست را به‌روز کنید.">
+                    <div>
                         <label for="status_id" class="ui-label">وضعیت</label>
                         <select id="status_id" name="status_id" required class="ui-select">
                             @foreach ($allowedStatuses as $status)
@@ -96,16 +96,24 @@
                             @endforeach
                         </select>
                     </div>
-                    <x-button>به‌روزرسانی وضعیت</x-button>
-                </form>
-            </x-card>
+                    <x-slot:actions>
+                        <x-button>به‌روزرسانی وضعیت</x-button>
+                    </x-slot:actions>
+                </x-form-shell>
+            </form>
         @endcan
 
         @can('close', $serviceRequest)
             @if (! $serviceRequest->isClosed())
-                <form method="POST" action="{{ \App\Support\OpsRoute::to('service-requests.close', $serviceRequest) }}">
+                <form method="POST" action="{{ \App\Support\OpsRoute::to('service-requests.close', $serviceRequest) }}" class="ui-card" onsubmit="return confirm('این درخواست بسته شود؟')">
                     @csrf
-                    <x-button variant="danger">بستن درخواست</x-button>
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                            <p class="text-sm font-semibold text-slate-900">بستن درخواست</p>
+                            <p class="mt-1 text-sm text-slate-500">پس از بستن، گردش عملیاتی این درخواست متوقف می‌شود.</p>
+                        </div>
+                        <x-button variant="danger">بستن درخواست</x-button>
+                    </div>
                 </form>
             @endif
         @endcan

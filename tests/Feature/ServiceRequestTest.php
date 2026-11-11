@@ -386,6 +386,29 @@ class ServiceRequestTest extends TestCase
             ->assertRedirect(route('login'));
     }
 
+    public function test_renaming_the_initial_status_display_name_does_not_break_creation(): void
+    {
+        Event::fake([ServiceRequestCreated::class]);
+
+        $operator = $this->staffUser(RoleName::Operator);
+        $context = $this->readyContext();
+        $context['status']->name = 'ثبت درخواست';
+        $context['status']->save();
+
+        $response = $this->actingAs($operator)
+            ->post(
+                route('operator.customers.service-requests.store', $context['customer']),
+                $this->requestPayload($context),
+            );
+
+        $serviceRequest = ServiceRequest::query()->first();
+
+        $this->assertNotNull($serviceRequest);
+        $this->assertSame($context['status']->id, $serviceRequest->status_id);
+        $this->assertSame('ثبت درخواست', $serviceRequest->status->name);
+        $response->assertRedirect(route('operator.service-requests.show', $serviceRequest));
+    }
+
     /**
      * @return array{
      *     customer: Customer,
@@ -402,7 +425,10 @@ class ServiceRequestTest extends TestCase
         $device = Device::factory()->for($customer)->create([
             'device_type_id' => $deviceType->id,
         ]);
-        $status = ServiceStatus::factory()->create(['name' => InitialServiceStatus::NAME]);
+        $status = ServiceStatus::factory()->create([
+            'name' => InitialServiceStatus::NAME,
+            'code' => InitialServiceStatus::CODE,
+        ]);
         $serviceType = ServiceType::factory()->create(['name' => 'Repair']);
         $serviceType->deviceTypes()->sync([$deviceType->id]);
         $serviceType->statuses()->sync([$status->id]);

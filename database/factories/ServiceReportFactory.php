@@ -20,6 +20,7 @@ class ServiceReportFactory extends Factory
     {
         return [
             'service_request_id' => ServiceRequest::factory(),
+            'description' => 'Completed service visit with the recorded work description.',
         ];
     }
 }

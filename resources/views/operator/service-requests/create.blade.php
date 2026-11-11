@@ -13,43 +13,44 @@
             @endcan
         </x-empty-state>
     @else
-        <x-card>
-            <form method="POST" action="{{ \App\Support\OpsRoute::to('customers.service-requests.store', $customer) }}" class="space-y-4">
-                @csrf
-
-                <div>
-                    <label for="device_id" class="ui-label">دستگاه</label>
-                    <select id="device_id" name="device_id" required class="ui-select">
-                        <option value="">انتخاب دستگاه</option>
-                        @foreach ($devices as $device)
-                            <option
-                                value="{{ $device->id }}"
-                                data-device-type-id="{{ $device->device_type_id }}"
-                                @selected((string) old('device_id') === (string) $device->id)
-                            >
-                                {{ $device->title }} ({{ $device->deviceType?->name }})
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div>
-                    <label for="service_type_id" class="ui-label">نوع خدمت</label>
-                    <select id="service_type_id" name="service_type_id" required class="ui-select">
-                        <option value="">انتخاب نوع خدمت</option>
-                        @foreach ($serviceTypesByDeviceType as $deviceTypeId => $serviceTypes)
-                            @foreach ($serviceTypes as $serviceType)
+        <form method="POST" action="{{ \App\Support\OpsRoute::to('customers.service-requests.store', $customer) }}">
+            @csrf
+            <x-form-shell kicker="عملیات" title="ثبت درخواست خدمت" subtitle="دستگاه، نوع خدمت و زمان ترجیحی را مشخص کنید.">
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div>
+                        <label for="device_id" class="ui-label">دستگاه</label>
+                        <select id="device_id" name="device_id" required class="ui-select">
+                            <option value="">انتخاب دستگاه</option>
+                            @foreach ($devices as $device)
                                 <option
-                                    value="{{ $serviceType->id }}"
-                                    data-device-type-id="{{ $deviceTypeId }}"
-                                    class="js-service-type-option"
-                                    @selected((string) old('service_type_id') === (string) $serviceType->id)
+                                    value="{{ $device->id }}"
+                                    data-device-type-id="{{ $device->device_type_id }}"
+                                    @selected((string) old('device_id') === (string) $device->id)
                                 >
-                                    {{ $serviceType->name }}
+                                    {{ $device->title }} ({{ $device->deviceType?->name }})
                                 </option>
                             @endforeach
-                        @endforeach
-                    </select>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="service_type_id" class="ui-label">نوع خدمت</label>
+                        <select id="service_type_id" name="service_type_id" required class="ui-select">
+                            <option value="">انتخاب نوع خدمت</option>
+                            @foreach ($serviceTypesByDeviceType as $deviceTypeId => $serviceTypes)
+                                @foreach ($serviceTypes as $serviceType)
+                                    <option
+                                        value="{{ $serviceType->id }}"
+                                        data-device-type-id="{{ $deviceTypeId }}"
+                                        class="js-service-type-option"
+                                        @selected((string) old('service_type_id') === (string) $serviceType->id)
+                                    >
+                                        {{ $serviceType->name }}
+                                    </option>
+                                @endforeach
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
 
                 <fieldset class="ui-fieldset">
@@ -76,21 +77,22 @@
                     </div>
                 </fieldset>
 
-                <div>
-                    <label for="source" class="ui-label">منبع</label>
-                    <select id="source" name="source" required class="ui-select">
-                        <option value="">انتخاب منبع</option>
-                        @foreach ($sources as $source)
-                            <option value="{{ $source->value }}" @selected((string) old('source') === $source->value)>
-                                {{ $source->value }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div>
-                    <label for="priority" class="ui-label">اولویت</label>
-                    <input id="priority" type="text" name="priority" value="{{ old('priority') }}" maxlength="20" required class="ui-input">
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div>
+                        <label for="source" class="ui-label">منبع</label>
+                        <select id="source" name="source" required class="ui-select">
+                            <option value="">انتخاب منبع</option>
+                            @foreach ($sources as $source)
+                                <option value="{{ $source->value }}" @selected((string) old('source') === $source->value)>
+                                    {{ $source->value }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label for="priority" class="ui-label">اولویت</label>
+                        <input id="priority" type="text" name="priority" value="{{ old('priority') }}" maxlength="20" required class="ui-input">
+                    </div>
                 </div>
 
                 <div>
@@ -98,19 +100,19 @@
                     <textarea id="problem_description" name="problem_description" required class="ui-textarea">{{ old('problem_description') }}</textarea>
                 </div>
 
-                <div>
-                    <label for="preferred_date" class="ui-label">تاریخ ترجیحی</label>
-                    <input id="preferred_date" type="date" name="preferred_date" value="{{ old('preferred_date') }}" required class="ui-input">
-                </div>
-
-                <div>
-                    <label for="preferred_start_time" class="ui-label">ساعت شروع ترجیحی</label>
-                    <input id="preferred_start_time" type="time" name="preferred_start_time" value="{{ old('preferred_start_time') }}" required class="ui-input">
-                </div>
-
-                <div>
-                    <label for="preferred_end_time" class="ui-label">ساعت پایان ترجیحی</label>
-                    <input id="preferred_end_time" type="time" name="preferred_end_time" value="{{ old('preferred_end_time') }}" required class="ui-input">
+                <div class="grid gap-4 sm:grid-cols-3">
+                    <div>
+                        <label for="preferred_date" class="ui-label">تاریخ ترجیحی</label>
+                        <input id="preferred_date" type="date" name="preferred_date" value="{{ old('preferred_date') }}" required class="ui-input">
+                    </div>
+                    <div>
+                        <label for="preferred_start_time" class="ui-label">ساعت شروع</label>
+                        <input id="preferred_start_time" type="time" name="preferred_start_time" value="{{ old('preferred_start_time') }}" required class="ui-input">
+                    </div>
+                    <div>
+                        <label for="preferred_end_time" class="ui-label">ساعت پایان</label>
+                        <input id="preferred_end_time" type="time" name="preferred_end_time" value="{{ old('preferred_end_time') }}" required class="ui-input">
+                    </div>
                 </div>
 
                 <div>
@@ -151,12 +153,12 @@
                     @endif
                 @endforeach
 
-                <div class="flex gap-2">
+                <x-slot:actions>
                     <x-button>ثبت درخواست خدمت</x-button>
                     <x-button variant="secondary" href="{{ \App\Support\OpsRoute::to('customers.edit', $customer) }}">بازگشت</x-button>
-                </div>
-            </form>
-        </x-card>
+                </x-slot:actions>
+            </x-form-shell>
+        </form>
     @endif
 
     <script>

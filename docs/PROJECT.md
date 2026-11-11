@@ -13,6 +13,7 @@ It is **not** a TV-only product and **not** a warehouse, GPS, payroll, or multi-
 - Laravel + PHP, MySQL, `utf8mb4`.
 - **Independent installation per company**: shared Laravel core/codebase, separate domain and **separate database** per company.
 - No `tenant_id`. No shared business data across companies. No cross-install data monitoring in the current plan.
+- Operational Git/host playbook: `docs/DEPLOYMENT.md` (push to `mazloomiaero/tv-yar`, SSH/hosting steps). Do not invent deploy paths that contradict that file.
 
 ## Numbers from the source
 

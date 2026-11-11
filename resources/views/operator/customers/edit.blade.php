@@ -3,20 +3,21 @@
 @section('content')
     <x-page-header title="ویرایش مشتری" subtitle="{{ $customer->customer_code }}" />
 
-    <x-card class="mb-6">
-        <form method="POST" action="{{ \App\Support\OpsRoute::to('customers.update', $customer) }}" class="space-y-4">
-            @csrf
-            @method('PUT')
+    <form method="POST" action="{{ \App\Support\OpsRoute::to('customers.update', $customer) }}" class="mb-6">
+        @csrf
+        @method('PUT')
+        <x-form-shell kicker="مشتری" title="ویرایش مشتری" subtitle="{{ $customer->first_name }} {{ $customer->last_name }}">
             @include('operator.customers._form', [
                 'customer' => $customer,
                 'mobile' => $customer->mobile,
             ])
-            <div class="flex gap-2">
+
+            <x-slot:actions>
                 <x-button>ذخیره مشتری</x-button>
                 <x-button variant="secondary" href="{{ \App\Support\OpsRoute::to('customers.search', array_filter(['q' => $customer->mobile])) }}">بازگشت به جستجو</x-button>
-            </div>
-        </form>
-    </x-card>
+            </x-slot:actions>
+        </x-form-shell>
+    </form>
 
     @can('viewAny', App\Models\Device::class)
         <x-page-header title="دستگاه‌ها">

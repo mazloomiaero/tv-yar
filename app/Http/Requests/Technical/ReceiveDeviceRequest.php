@@ -51,14 +51,12 @@ class ReceiveDeviceRequest extends FormRequest
                 );
             }
 
-            $status = ServiceStatus::query()
-                ->where('name', WorkshopServiceStatus::DeviceReceived)
-                ->first();
+            $status = ServiceStatus::findByCode(WorkshopServiceStatus::DeviceReceivedCode);
 
             if (! $status instanceof ServiceStatus) {
                 $validator->errors()->add(
                     'received_date',
-                    'Status ['.WorkshopServiceStatus::DeviceReceived.'] is not seeded.',
+                    'Status ['.WorkshopServiceStatus::DeviceReceivedCode.'] is not seeded.',
                 );
 
                 return;

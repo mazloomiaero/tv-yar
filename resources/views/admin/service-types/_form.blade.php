@@ -5,9 +5,9 @@
 
 <fieldset class="ui-fieldset">
     <legend class="ui-legend">انواع دستگاه</legend>
-    @forelse ($deviceTypes as $deviceType)
-        <div>
-            <label class="inline-flex items-center gap-2 text-sm">
+    <div class="ui-check-grid">
+        @forelse ($deviceTypes as $deviceType)
+            <label class="ui-check-pill">
                 <input
                     type="checkbox"
                     name="device_type_ids[]"
@@ -17,17 +17,17 @@
                 >
                 {{ $deviceType->name }}
             </label>
-        </div>
-    @empty
-        <p class="text-sm text-slate-500">نوع دستگاهی ثبت نشده است.</p>
-    @endforelse
+        @empty
+            <p class="text-sm text-slate-500">نوع دستگاهی ثبت نشده است.</p>
+        @endforelse
+    </div>
 </fieldset>
 
 <fieldset class="ui-fieldset">
     <legend class="ui-legend">وضعیت‌های مجاز</legend>
-    @forelse ($serviceStatuses as $serviceStatus)
-        <div>
-            <label class="inline-flex items-center gap-2 text-sm">
+    <div class="ui-check-grid">
+        @forelse ($serviceStatuses as $serviceStatus)
+            <label class="ui-check-pill">
                 <input
                     type="checkbox"
                     name="service_status_ids[]"
@@ -37,8 +37,8 @@
                 >
                 {{ $serviceStatus->name }}
             </label>
-        </div>
-    @empty
-        <p class="text-sm text-slate-500">وضعیتی ثبت نشده است.</p>
-    @endforelse
+        @empty
+            <p class="text-sm text-slate-500">وضعیتی ثبت نشده است.</p>
+        @endforelse
+    </div>
 </fieldset>

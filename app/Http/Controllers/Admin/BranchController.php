@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exceptions\CatalogDeletionException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreBranchRequest;
 use App\Http\Requests\Admin\UpdateBranchRequest;
@@ -57,7 +58,13 @@ class BranchController extends Controller
 
     public function destroy(Branch $branch): RedirectResponse
     {
-        $branch->delete();
+        try {
+            $branch->delete();
+        } catch (CatalogDeletionException $exception) {
+            return redirect()
+                ->back()
+                ->withErrors(['delete' => $exception->getMessage()]);
+        }
 
         return redirect()
             ->route('admin.branches.index')

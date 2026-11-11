@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Middleware\AddSecurityHeaders;
 use App\Http\Middleware\EnsurePanelAccess;
 use App\Http\Middleware\EnsurePermission;
 use App\Models\User;
@@ -53,6 +54,8 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->append(AddSecurityHeaders::class);
+
         $middleware->alias([
             'panel' => EnsurePanelAccess::class,
             'permission' => EnsurePermission::class,

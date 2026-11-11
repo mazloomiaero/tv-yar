@@ -93,20 +93,25 @@ class PaymentService
 
     /**
      * Accountant confirmation for card_transfer/cash. Not a new payment method.
+     *
+     * @return array{payment: Payment, alreadyConfirmed: bool}
      */
-    public function confirmManual(Payment $payment): Payment
+    public function confirmManual(Payment $payment): array
     {
         if ($payment->method === PaymentMethod::Gateway->value) {
             throw new InvalidArgumentException('Gateway payments are confirmed by verify, not accountant confirmation.');
         }
 
         $dispatched = false;
+        $alreadyConfirmed = false;
 
-        $confirmed = DB::transaction(function () use ($payment, &$dispatched): Payment {
+        $confirmed = DB::transaction(function () use ($payment, &$dispatched, &$alreadyConfirmed): Payment {
             /** @var Payment $locked */
             $locked = Payment::query()->whereKey($payment->id)->lockForUpdate()->firstOrFail();
 
             if ($locked->status === PaymentStatus::Completed->value) {
+                $alreadyConfirmed = true;
+
                 return $locked;
             }
 
@@ -132,6 +137,9 @@ class PaymentService
             PaymentConfirmed::dispatch((int) $confirmed->id);
         }
 
-        return $confirmed;
+        return [
+            'payment' => $confirmed,
+            'alreadyConfirmed' => $alreadyConfirmed,
+        ];
     }
 }

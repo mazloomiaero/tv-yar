@@ -1,16 +1,17 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('content')
-    <x-page-header title="ثبت قطعه" />
+    <x-page-header title="ثبت قطعه" subtitle="قطعه و قیمت پایه را ثبت کنید." />
 
-    <x-card>
-        <form method="POST" action="{{ route('admin.parts.store') }}" class="space-y-4">
-            @csrf
+    <form method="POST" action="{{ route('admin.parts.store') }}">
+        @csrf
+        <x-form-shell kicker="کاتالوگ" title="ثبت قطعه" subtitle="قطعه و قیمت پایه را ثبت کنید.">
             @include('admin.parts._form', ['part' => null])
-            <div class="flex gap-2">
+
+            <x-slot:actions>
                 <x-button>ثبت</x-button>
                 <x-button variant="secondary" href="{{ route('admin.parts.index') }}">بازگشت</x-button>
-            </div>
-        </form>
-    </x-card>
+            </x-slot:actions>
+        </x-form-shell>
+    </form>
 @endsection

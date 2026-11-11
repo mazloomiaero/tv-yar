@@ -58,14 +58,12 @@ class DeliverDeviceRequest extends FormRequest
                 );
             }
 
-            $status = ServiceStatus::query()
-                ->where('name', WorkshopServiceStatus::Delivered)
-                ->first();
+            $status = ServiceStatus::findByCode(WorkshopServiceStatus::DeliveredCode);
 
             if (! $status instanceof ServiceStatus) {
                 $validator->errors()->add(
                     'delivery_date',
-                    'Status ['.WorkshopServiceStatus::Delivered.'] is not seeded.',
+                    'Status ['.WorkshopServiceStatus::DeliveredCode.'] is not seeded.',
                 );
 
                 return;

@@ -3,15 +3,16 @@
 @section('content')
     <x-page-header title="ویرایش دستگاه" subtitle="{{ $customer->customer_code }} — {{ $customer->first_name }} {{ $customer->last_name }}" />
 
-    <x-card>
-        <form method="POST" action="{{ \App\Support\OpsRoute::to('customers.devices.update', [$customer, $device]) }}" class="space-y-4">
-            @csrf
-            @method('PUT')
+    <form method="POST" action="{{ \App\Support\OpsRoute::to('customers.devices.update', [$customer, $device]) }}">
+        @csrf
+        @method('PUT')
+        <x-form-shell kicker="دستگاه" title="ویرایش دستگاه" subtitle="{{ $device->title }}">
             @include('operator.devices._form', ['device' => $device])
-            <div class="flex gap-2">
+
+            <x-slot:actions>
                 <x-button>ذخیره دستگاه</x-button>
                 <x-button variant="secondary" href="{{ \App\Support\OpsRoute::to('customers.edit', $customer) }}">بازگشت</x-button>
-            </div>
-        </form>
-    </x-card>
+            </x-slot:actions>
+        </x-form-shell>
+    </form>
 @endsection

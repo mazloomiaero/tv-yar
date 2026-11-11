@@ -39,7 +39,7 @@ final class DeliverDevice
             );
         }
 
-        $status = $this->statusNamed(WorkshopServiceStatus::Delivered);
+        $status = $this->statusByCode(WorkshopServiceStatus::DeliveredCode);
 
         $reception = DB::transaction(function () use ($serviceRequest, $deliveredBy, $attributes, $reception, $status): DeviceReception {
             $reception->delivery_date = $attributes['delivery_date'];
@@ -56,12 +56,12 @@ final class DeliverDevice
         return $reception;
     }
 
-    private function statusNamed(string $name): ServiceStatus
+    private function statusByCode(string $code): ServiceStatus
     {
-        $status = ServiceStatus::query()->where('name', $name)->first();
+        $status = ServiceStatus::findByCode($code);
 
         if (! $status instanceof ServiceStatus) {
-            throw new RuntimeException('Seeded status ['.$name.'] is missing.');
+            throw new RuntimeException('Seeded status ['.$code.'] is missing.');
         }
 
         return $status;

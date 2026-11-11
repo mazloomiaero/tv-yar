@@ -114,14 +114,12 @@ class StoreServiceRequestRequest extends FormRequest
             return;
         }
 
-        $status = ServiceStatus::query()
-            ->where('name', InitialServiceStatus::NAME)
-            ->first();
+        $status = ServiceStatus::findByCode(InitialServiceStatus::CODE);
 
         if (! $status instanceof ServiceStatus) {
             $validator->errors()->add(
                 'service_type_id',
-                'Seeded status ['.InitialServiceStatus::NAME.'] is missing.',
+                'Seeded status ['.InitialServiceStatus::CODE.'] is missing.',
             );
 
             return;
@@ -138,7 +136,7 @@ class StoreServiceRequestRequest extends FormRequest
         if (! $mapped) {
             $validator->errors()->add(
                 'service_type_id',
-                'Status ['.InitialServiceStatus::NAME.'] is not mapped for this service type.',
+                'Status ['.InitialServiceStatus::CODE.'] is not mapped for this service type.',
             );
         }
     }

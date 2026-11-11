@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
     'service_request_id',
+    'description',
 ])]
 class ServiceReport extends Model
 {

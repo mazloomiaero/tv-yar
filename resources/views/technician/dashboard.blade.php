@@ -1,37 +1,51 @@
 @extends('layouts.technician')
 
 @section('content')
-    <x-page-header title="داشبورد تکنسین" subtitle="ارجاع‌های تخصیص‌یافته به شما" />
+    <x-dashboard.hero
+        eyebrow="میدان"
+        title="داشبورد تکنسین"
+        subtitle="ارجاع‌های تخصیص‌یافته به شما و وضعیت پیشنهاد سیستم."
+    >
+        <x-slot:actions>
+            <x-button href="{{ route('technician.assignments.index') }}">ارجاع‌های من</x-button>
+        </x-slot:actions>
+    </x-dashboard.hero>
 
-    <div class="mb-8 grid gap-3 sm:grid-cols-2">
-        <div class="ui-stat">
-            <p class="ui-stat-label">ارجاع‌ها</p>
-            <p class="ui-stat-value">{{ $assignmentCount }}</p>
-            <p class="ui-stat-key">assignments: {{ $assignmentCount }}</p>
+    <x-dashboard.section title="خلاصه ارجاع">
+        <div class="dash-metric-grid">
+            <x-dashboard.metric label="ارجاع‌ها" :value="$assignmentCount" tone="brand" />
+            <x-dashboard.metric label="از فهرست پیشنهاد" :value="$suggestedCount" tone="ok" />
         </div>
-        <div class="ui-stat">
-            <p class="ui-stat-label">از فهرست پیشنهاد</p>
-            <p class="ui-stat-value">{{ $suggestedCount }}</p>
-            <p class="ui-stat-key">is_suggested true: {{ $suggestedCount }}</p>
-        </div>
-    </div>
+    </x-dashboard.section>
 
-    @if ($assignments->isEmpty())
-        <x-empty-state>ارجاعی ثبت نشده است.</x-empty-state>
-    @else
-        <x-table>
-            <x-slot:head>
-                <th>درخواست</th>
-                <th>تاریخ</th>
-                <th>پیشنهاد</th>
-            </x-slot:head>
-            @foreach ($assignments as $assignment)
-                <tr>
-                    <td>{{ $assignment->serviceRequest?->request_number }}</td>
-                    <td>{{ $assignment->scheduled_date?->toDateString() }}</td>
-                    <td>is_suggested {{ $assignment->is_suggested ? 'true' : 'false' }}</td>
-                </tr>
-            @endforeach
-        </x-table>
-    @endif
+    <x-dashboard.section title="لیست ارجاع‌ها" subtitle="برای جزئیات و ثبت گزارش وارد ارجاع شوید">
+        @if ($assignments->isEmpty())
+            <x-empty-state>ارجاعی ثبت نشده است.</x-empty-state>
+        @else
+            <div class="dash-table-panel">
+                <x-table>
+                    <x-slot:head>
+                        <th>درخواست</th>
+                        <th>تاریخ</th>
+                        <th>نوع انتخاب</th>
+                        <th></th>
+                    </x-slot:head>
+                    @foreach ($assignments as $assignment)
+                        <tr>
+                            <td class="font-medium text-slate-900">{{ $assignment->serviceRequest?->request_number }}</td>
+                            <td class="tabular-nums">{{ $assignment->scheduled_date?->toDateString() }}</td>
+                            <td>
+                                <span class="ui-badge">
+                                    {{ $assignment->is_suggested ? 'از پیشنهاد سیستم' : 'انتخاب دستی' }}
+                                </span>
+                            </td>
+                            <td>
+                                <a class="ui-link" href="{{ route('technician.assignments.show', $assignment) }}">مشاهده</a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </x-table>
+            </div>
+        @endif
+    </x-dashboard.section>
 @endsection

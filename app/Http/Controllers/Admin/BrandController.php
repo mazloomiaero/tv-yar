@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exceptions\CatalogDeletionException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreBrandRequest;
 use App\Http\Requests\Admin\UpdateBrandRequest;
@@ -59,7 +60,13 @@ class BrandController extends Controller
 
     public function destroy(Brand $brand): RedirectResponse
     {
-        $brand->delete();
+        try {
+            $brand->delete();
+        } catch (CatalogDeletionException $exception) {
+            return redirect()
+                ->back()
+                ->withErrors(['delete' => $exception->getMessage()]);
+        }
 
         return redirect()
             ->route('admin.brands.index')

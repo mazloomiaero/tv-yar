@@ -403,8 +403,15 @@ class PaymentTest extends TestCase
         $payment = Payment::query()->first();
         $this->assertNotNull($payment);
 
-        $this->actingAs($accountant)->post(route('accountant.payments.confirm', $payment));
-        $this->actingAs($accountant)->post(route('accountant.payments.confirm', $payment));
+        $this->actingAs($accountant)
+            ->post(route('accountant.payments.confirm', $payment))
+            ->assertRedirect(route('accountant.payments.show', $payment))
+            ->assertSessionHas('status', 'Payment confirmed.');
+
+        $this->actingAs($accountant)
+            ->post(route('accountant.payments.confirm', $payment))
+            ->assertRedirect(route('accountant.payments.show', $payment))
+            ->assertSessionHas('status', 'Payment already confirmed.');
 
         Event::assertDispatchedTimes(PaymentConfirmed::class, 1);
         $this->assertSame(1, Payment::query()->where('status', PaymentStatus::Completed->value)->count());

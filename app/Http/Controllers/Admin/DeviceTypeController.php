@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exceptions\CatalogDeletionException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreDeviceTypeRequest;
 use App\Http\Requests\Admin\UpdateDeviceTypeRequest;
@@ -59,7 +60,13 @@ class DeviceTypeController extends Controller
 
     public function destroy(DeviceType $deviceType): RedirectResponse
     {
-        $deviceType->delete();
+        try {
+            $deviceType->delete();
+        } catch (CatalogDeletionException $exception) {
+            return redirect()
+                ->back()
+                ->withErrors(['delete' => $exception->getMessage()]);
+        }
 
         return redirect()
             ->route('admin.device-types.index')

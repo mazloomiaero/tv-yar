@@ -47,6 +47,7 @@ class ServiceReportController extends Controller
             $assignment->serviceRequest,
             $request->partLines(),
             $request->imagesByKind(),
+            $request->reportDescription(),
         );
 
         return redirect()

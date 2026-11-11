@@ -1,9 +1,9 @@
 @extends('layouts.technician')
 
 @section('content')
-    <x-page-header title="ثبت پرداخت برای {{ $invoice->invoice_number }}" />
+    <x-page-header title="ثبت پرداخت" subtitle="فاکتور {{ $invoice->invoice_number }}" />
 
-    <x-card class="mb-6">
+    <x-card class="mb-4">
         <dl class="ui-dl">
             <div>
                 <dt>جمع</dt>
@@ -20,32 +20,39 @@
         </dl>
     </x-card>
 
-    <x-card class="mb-6">
-        <form method="post" action="{{ route('technician.payments.store', $invoice) }}" enctype="multipart/form-data" class="space-y-4">
-            @csrf
-            <div>
-                <label for="method" class="ui-label">روش</label>
-                <select id="method" name="method" class="ui-select">
-                    @foreach ($methods as $method)
-                        <option value="{{ $method }}" @selected(old('method') === $method)>{{ $method }}</option>
-                    @endforeach
-                </select>
+    <form method="post" action="{{ route('technician.payments.store', $invoice) }}" enctype="multipart/form-data" class="mb-4">
+        @csrf
+        <x-form-shell kicker="مالی" title="ثبت پرداخت" subtitle="روش پرداخت و مبلغ را وارد کنید.">
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                    <label for="method" class="ui-label">روش</label>
+                    <select id="method" name="method" class="ui-select">
+                        @foreach ($methods as $method)
+                            <option value="{{ $method }}" @selected(old('method') === $method)>{{ $method }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label for="amount" class="ui-label">مبلغ</label>
+                    <input id="amount" name="amount" value="{{ old('amount', $remaining) }}" class="ui-input">
+                </div>
             </div>
-            <div>
-                <label for="amount" class="ui-label">مبلغ</label>
-                <input id="amount" name="amount" value="{{ old('amount', $remaining) }}" class="ui-input">
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                    <label for="reference_number" class="ui-label">شماره مرجع</label>
+                    <input id="reference_number" name="reference_number" value="{{ old('reference_number') }}" class="ui-input">
+                </div>
+                <div>
+                    <label for="receipt_image" class="ui-label">تصویر رسید</label>
+                    <input id="receipt_image" name="receipt_image" type="file" class="ui-file">
+                </div>
             </div>
-            <div>
-                <label for="reference_number" class="ui-label">شماره مرجع</label>
-                <input id="reference_number" name="reference_number" value="{{ old('reference_number') }}" class="ui-input">
-            </div>
-            <div>
-                <label for="receipt_image" class="ui-label">تصویر رسید</label>
-                <input id="receipt_image" name="receipt_image" type="file" class="ui-input">
-            </div>
-            <x-button>ثبت پرداخت</x-button>
-        </form>
-    </x-card>
+
+            <x-slot:actions>
+                <x-button>ثبت پرداخت</x-button>
+            </x-slot:actions>
+        </x-form-shell>
+    </form>
 
     <x-card title="پرداخت‌های ثبت‌شده">
         @if ($invoice->payments->isEmpty())

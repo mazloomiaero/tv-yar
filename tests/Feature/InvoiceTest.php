@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Actions\Invoice\CreateInvoice;
 use App\Events\InvoiceCreated;
 use App\Models\Customer;
 use App\Models\CustomerAddress;
@@ -26,6 +27,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
+use InvalidArgumentException;
 use Tests\TestCase;
 
 class InvoiceTest extends TestCase
@@ -103,6 +105,42 @@ class InvoiceTest extends TestCase
             ->assertSee('Sara Karimi')
             ->assertSee('Compressor')
             ->assertSee('Free gasket');
+    }
+
+    public function test_creating_an_invoice_twice_for_the_same_request_is_rejected(): void
+    {
+        Event::fake([InvoiceCreated::class]);
+
+        $context = $this->invoiceContext();
+        $createInvoice = app(CreateInvoice::class);
+        $attributes = [
+            'discount' => '0',
+            'tax' => '0',
+        ];
+        $year = (int) config('document.year');
+
+        $invoice = $createInvoice->execute($context['request'], $attributes, $year);
+
+        try {
+            $createInvoice->execute($context['request'], $attributes, $year);
+            $this->fail('A second invoice for the same service request must be rejected.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertStringContainsString($invoice->invoice_number, $exception->getMessage());
+        }
+
+        $this->assertSame(1, Invoice::query()->count());
+        $this->assertSame(1, Invoice::query()->where('service_request_id', $context['request']->id)->count());
+        $this->assertSame(2, $invoice->items()->count());
+        $this->assertSame($invoice->id, Invoice::query()->sole()->id);
+
+        $indexes = collect(Schema::getIndexes('invoices'));
+        $this->assertTrue(
+            $indexes->contains(
+                fn (array $index): bool => in_array('service_request_id', $index['columns'], true) && $index['unique'],
+            ),
+        );
+
+        Event::assertDispatchedTimes(InvoiceCreated::class, 1);
     }
 
     public function test_invoice_customer_snapshot_does_not_change_when_live_customer_is_updated(): void

@@ -18,7 +18,11 @@
     }
 
     body {
-        @apply bg-slate-50 text-slate-800 antialiased;
+        @apply text-slate-800 antialiased;
+        background:
+            radial-gradient(900px 420px at 100% -10%, color-mix(in srgb, var(--color-brand) 10%, transparent), transparent 55%),
+            radial-gradient(700px 360px at -5% 110%, color-mix(in srgb, #0369a1 8%, transparent), transparent 50%),
+            #f8fafc;
     }
 
     :focus-visible {
@@ -29,61 +33,158 @@
 
 @layer components {
     .ui-page-title {
-        @apply text-xl font-semibold text-slate-900 sm:text-2xl;
+        @apply text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl;
     }
 
     .ui-page-subtitle {
-        @apply mt-1 text-sm text-slate-500;
+        @apply mt-1.5 max-w-2xl text-sm leading-6 text-slate-500;
     }
 
     .ui-card {
-        @apply rounded-xl border border-slate-200 bg-white p-5 shadow-sm;
+        @apply relative overflow-hidden rounded-2xl border border-slate-200/90 bg-white p-5 shadow-[0_12px_32px_-24px_rgba(15,23,42,0.35)] sm:p-6;
+    }
+
+    .ui-card::before {
+        content: '';
+        position: absolute;
+        inset-inline: 0;
+        top: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--color-brand), color-mix(in srgb, var(--color-brand) 35%, #0369a1));
+    }
+
+    .ui-form-shell {
+        @apply relative overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_16px_40px_-28px_rgba(15,23,42,0.45)];
+    }
+
+    .ui-form-shell::before {
+        content: '';
+        position: absolute;
+        inset-inline: 0;
+        top: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--color-brand), color-mix(in srgb, var(--color-brand) 35%, #0369a1));
+    }
+
+    .ui-form-shell__head {
+        @apply border-b border-slate-100 bg-gradient-to-l from-slate-50 via-white to-teal-50/40 px-5 py-4 sm:px-6;
+    }
+
+    .ui-form-shell__kicker {
+        @apply mb-1 text-xs font-semibold tracking-[0.12em] text-teal-800 uppercase;
+    }
+
+    .ui-form-shell__title {
+        @apply text-lg font-bold text-slate-900;
+    }
+
+    .ui-form-shell__subtitle {
+        @apply mt-1 text-sm text-slate-500;
+    }
+
+    .ui-form-shell__body {
+        @apply space-y-5 p-5 sm:p-6;
+    }
+
+    .ui-form-shell__actions {
+        @apply flex flex-wrap items-center gap-2 border-t border-slate-100 bg-slate-50/70 px-5 py-4 sm:px-6;
     }
 
     .ui-label {
-        @apply mb-1.5 block text-sm font-medium text-slate-700;
+        @apply mb-1.5 block text-sm font-semibold text-slate-700;
+    }
+
+    .ui-label span[style*='dc2626'],
+    .ui-label .ui-required {
+        @apply ms-0.5 font-bold text-red-600;
     }
 
     .ui-input,
     .ui-select,
     .ui-textarea {
-        @apply block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition;
+        @apply block w-full rounded-xl border border-slate-200 bg-slate-50/80 px-3.5 py-2.5 text-sm text-slate-900 shadow-sm transition duration-200;
         @apply placeholder:text-slate-400;
-        @apply focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20 focus:outline-none;
+        min-height: 2.75rem;
+        @apply hover:border-slate-300 hover:bg-white;
+        @apply focus:border-teal-600 focus:bg-white focus:ring-4 focus:ring-teal-600/15 focus:outline-none;
     }
 
     .ui-textarea {
-        @apply min-h-24;
+        @apply min-h-28 py-3;
+    }
+
+    .ui-select {
+        @apply pe-10;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='1.8' d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+        background-position: left 0.75rem center;
+        background-repeat: no-repeat;
+        background-size: 1.1rem;
+        appearance: none;
+    }
+
+    .ui-input.border-red-500,
+    .ui-select.border-red-500,
+    .ui-textarea.border-red-500 {
+        @apply border-red-400 bg-red-50/40 focus:border-red-500 focus:ring-red-500/15;
     }
 
     .ui-checkbox {
-        @apply size-4 rounded border-slate-300 text-teal-700 focus:ring-teal-600;
+        @apply size-4 cursor-pointer rounded border-slate-300 text-teal-700 focus:ring-teal-600;
     }
 
     .ui-fieldset {
-        @apply space-y-3 rounded-xl border border-slate-200 bg-slate-50/70 p-4;
+        @apply space-y-3 rounded-2xl border border-dashed border-slate-200 bg-gradient-to-br from-slate-50 via-white to-teal-50/30 p-4 sm:p-5;
     }
 
     .ui-legend {
-        @apply px-1 text-sm font-semibold text-slate-800;
+        @apply px-1 text-sm font-bold text-slate-800;
+    }
+
+    .ui-form-section {
+        @apply rounded-xl border border-slate-100 bg-slate-50/70 px-4 py-3;
+    }
+
+    .ui-form-section__title {
+        @apply text-sm font-bold text-slate-900;
+    }
+
+    .ui-form-section__hint {
+        @apply mt-1 text-xs leading-5 text-slate-500;
+    }
+
+    .ui-file {
+        @apply block w-full cursor-pointer rounded-xl border border-dashed border-slate-300 bg-slate-50/80 px-3.5 py-3 text-sm text-slate-700 transition;
+        @apply file:me-3 file:rounded-lg file:border-0 file:bg-teal-700 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-white;
+        @apply hover:border-teal-400 hover:bg-white;
+        @apply focus:border-teal-600 focus:bg-white focus:ring-4 focus:ring-teal-600/15 focus:outline-none;
+    }
+
+    .ui-check-grid {
+        @apply grid gap-2 sm:grid-cols-2 lg:grid-cols-3;
+    }
+
+    .ui-check-pill {
+        @apply inline-flex w-full cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 shadow-sm transition;
+        @apply hover:border-teal-300 hover:bg-teal-50/40;
+        @apply has-[:checked]:border-teal-600 has-[:checked]:bg-teal-50 has-[:checked]:text-teal-950;
     }
 
     .ui-btn-primary,
     .ui-btn-secondary,
     .ui-btn-danger,
     .ui-btn-ghost {
-        @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition;
+        @apply inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition duration-200;
         @apply focus-visible:outline-2 focus-visible:outline-offset-2;
         @apply disabled:cursor-not-allowed disabled:opacity-50;
     }
 
     .ui-btn-primary {
-        @apply text-white hover:brightness-95;
-        background-color: var(--color-brand);
+        @apply text-white shadow-sm hover:-translate-y-px hover:brightness-95 hover:shadow-md;
+        background: linear-gradient(135deg, var(--color-brand), color-mix(in srgb, var(--color-brand) 70%, #0f172a));
     }
 
     .ui-btn-secondary {
-        @apply border border-slate-300 bg-white text-slate-700 hover:bg-slate-50;
+        @apply border border-slate-200 bg-white text-slate-700 shadow-sm hover:border-slate-300 hover:bg-slate-50;
     }
 
     .ui-btn-danger {
@@ -96,7 +197,7 @@
 
     .ui-alert-success,
     .ui-alert-danger {
-        @apply rounded-lg border px-4 py-3 text-sm;
+        @apply rounded-xl border px-4 py-3 text-sm shadow-sm;
     }
 
     .ui-alert-success {
@@ -108,7 +209,7 @@
     }
 
     .ui-table-wrap {
-        @apply overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm;
+        @apply overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-[0_10px_28px_-22px_rgba(15,23,42,0.35)];
     }
 
     .ui-table {
@@ -116,20 +217,31 @@
     }
 
     .ui-table thead {
-        @apply bg-slate-50 text-right text-xs font-semibold tracking-wide text-slate-500 uppercase;
+        @apply bg-slate-50/90 text-right text-xs font-semibold tracking-wide text-slate-500;
     }
 
     .ui-table th,
     .ui-table td {
-        @apply px-4 py-3 whitespace-nowrap;
+        @apply px-4 py-3.5 whitespace-nowrap;
     }
 
     .ui-table tbody tr {
-        @apply border-t border-slate-100 hover:bg-slate-50/80;
+        @apply border-t border-slate-100 transition hover:bg-teal-50/40;
     }
 
     .ui-empty {
-        @apply rounded-xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center text-sm text-slate-500;
+        @apply rounded-2xl border border-dashed border-slate-300 bg-white/80 px-6 py-14 text-center text-sm text-slate-500;
+    }
+
+    /* Forms inside generic cards get nicer rhythm without per-page edits */
+    .ui-card > form,
+    .ui-form {
+        @apply space-y-5;
+    }
+
+    .ui-card > form > .flex.gap-2:last-child,
+    .ui-form-actions {
+        @apply mt-2 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-5;
     }
 
     .ui-stat {
@@ -181,11 +293,11 @@
     }
 
     .ui-password .ui-input {
-        @apply pe-11;
+        @apply pe-12;
     }
 
     .ui-password-toggle {
-        @apply absolute inset-y-0 end-0 flex cursor-pointer items-center px-3 text-slate-500 transition hover:text-slate-800;
+        @apply absolute inset-y-0 end-0 m-1 flex min-w-10 cursor-pointer items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-800;
     }
 
     .auth-shell {
@@ -344,10 +456,133 @@
     }
 
     .ui-nav-link {
-        @apply flex items-center rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white;
+        @apply flex items-center rounded-lg px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white;
+        min-height: 44px;
     }
 
     .ui-nav-link-active {
         @apply bg-white/15 text-white;
+    }
+
+    .panel-shell {
+        background:
+            radial-gradient(900px 420px at 100% -10%, color-mix(in srgb, var(--color-brand) 12%, transparent), transparent 55%),
+            radial-gradient(700px 360px at 0% 0%, color-mix(in srgb, #0369a1 8%, transparent), transparent 50%),
+            #f8fafc;
+    }
+
+    .dash-hero {
+        @apply mb-6 flex flex-col gap-4 rounded-2xl border border-slate-200/80 bg-white/90 p-5 shadow-[0_10px_30px_-22px_rgba(15,23,42,0.35)] sm:flex-row sm:items-end sm:justify-between sm:p-6;
+        backdrop-filter: blur(8px);
+    }
+
+    .dash-hero__eyebrow {
+        @apply mb-2 text-xs font-semibold tracking-[0.14em] text-teal-800 uppercase;
+    }
+
+    .dash-hero__title {
+        @apply text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl;
+    }
+
+    .dash-hero__subtitle {
+        @apply mt-2 max-w-2xl text-sm leading-6 text-slate-500;
+    }
+
+    .dash-hero__actions {
+        @apply flex flex-wrap gap-2;
+    }
+
+    .dash-section {
+        @apply mb-6 rounded-2xl border border-slate-200/90 bg-white p-4 shadow-[0_8px_24px_-20px_rgba(15,23,42,0.35)] sm:p-5;
+    }
+
+    .dash-section__head {
+        @apply mb-4 flex flex-col gap-2 border-b border-slate-100 pb-3 sm:flex-row sm:items-center sm:justify-between;
+    }
+
+    .dash-section__title {
+        @apply text-base font-semibold text-slate-900;
+    }
+
+    .dash-section__subtitle {
+        @apply mt-1 text-sm text-slate-500;
+    }
+
+    .dash-section__actions {
+        @apply flex flex-wrap gap-2;
+    }
+
+    .dash-metric-grid {
+        @apply grid gap-3 sm:grid-cols-2 xl:grid-cols-4;
+    }
+
+    .dash-metric-grid--5 {
+        @apply xl:grid-cols-5;
+    }
+
+    .dash-metric-grid--3 {
+        @apply xl:grid-cols-3;
+    }
+
+    .dash-metric {
+        @apply rounded-xl border border-slate-200 bg-slate-50/70 p-4 transition duration-200;
+        @apply hover:border-teal-200 hover:bg-white hover:shadow-md;
+    }
+
+    .dash-metric--brand {
+        border-inline-start-width: 4px;
+        border-inline-start-color: var(--color-brand);
+        @apply bg-white;
+    }
+
+    .dash-metric--soft {
+        @apply border-sky-100 bg-sky-50/60;
+    }
+
+    .dash-metric--warn {
+        @apply border-amber-100 bg-amber-50/70;
+    }
+
+    .dash-metric--ok {
+        @apply border-emerald-100 bg-emerald-50/70;
+    }
+
+    .dash-metric__label {
+        @apply text-sm font-medium text-slate-500;
+    }
+
+    .dash-metric__value {
+        @apply mt-2 text-2xl font-bold tracking-tight text-slate-900 tabular-nums;
+    }
+
+    .dash-metric__hint {
+        @apply mt-1 text-xs text-slate-400;
+    }
+
+    .dash-bento {
+        @apply grid gap-3 sm:grid-cols-2;
+    }
+
+    .dash-start-card {
+        @apply flex gap-3 rounded-xl border border-slate-200 bg-slate-50/80 p-4 transition duration-200;
+        @apply hover:border-teal-300 hover:bg-white hover:shadow-md;
+        min-height: 44px;
+    }
+
+    .dash-start-index {
+        @apply flex size-9 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-white;
+        background-color: var(--color-brand);
+    }
+
+    .dash-table-panel {
+        @apply overflow-hidden rounded-xl border border-slate-200;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .dash-metric,
+        .dash-start-card,
+        .ui-nav-link {
+            transition: none;
+        }
     }
 }

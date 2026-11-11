@@ -123,13 +123,11 @@ final class CreateServiceRequest
 
     private function initialStatusFor(ServiceType $serviceType): ServiceStatus
     {
-        $status = ServiceStatus::query()
-            ->where('name', InitialServiceStatus::NAME)
-            ->first();
+        $status = ServiceStatus::findByCode(InitialServiceStatus::CODE);
 
         if (! $status instanceof ServiceStatus) {
             throw new RuntimeException(
-                'Seeded status ['.InitialServiceStatus::NAME.'] is missing.',
+                'Seeded status ['.InitialServiceStatus::CODE.'] is missing.',
             );
         }
 
@@ -139,7 +137,7 @@ final class CreateServiceRequest
 
         if (! $mapped) {
             throw new RuntimeException(
-                'Status ['.InitialServiceStatus::NAME.'] is not mapped for this service type.',
+                'Status ['.InitialServiceStatus::CODE.'] is not mapped for this service type.',
             );
         }
 

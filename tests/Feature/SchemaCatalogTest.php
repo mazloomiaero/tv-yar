@@ -102,7 +102,14 @@ class SchemaCatalogTest extends TestCase
         $this->assertFalse(Schema::hasColumn('service_types', 'code'));
         $this->assertFalse(Schema::hasColumn('service_types', 'color'));
         $this->assertFalse(Schema::hasColumn('service_types', 'order'));
-        $this->assertFalse(Schema::hasColumn('service_statuses', 'code'));
+        $this->assertTrue(Schema::hasColumn('service_statuses', 'code'));
+        $this->assertTrue(Schema::hasColumn('service_statuses', 'is_system'));
+        $code = collect(Schema::getColumns('service_statuses'))->firstWhere('name', 'code');
+        $this->assertNotNull($code);
+        $this->assertTrue($code['nullable']);
+        $isSystem = collect(Schema::getColumns('service_statuses'))->firstWhere('name', 'is_system');
+        $this->assertNotNull($isSystem);
+        $this->assertFalse($isSystem['nullable']);
         $this->assertFalse(Schema::hasColumn('service_statuses', 'color'));
         $this->assertFalse(Schema::hasColumn('service_statuses', 'order'));
         $this->assertFalse(Schema::hasColumn('service_statuses', 'is_terminal'));

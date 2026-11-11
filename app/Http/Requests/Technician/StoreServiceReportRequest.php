@@ -42,6 +42,11 @@ class StoreServiceReportRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        $description = $this->input('description');
+        if (is_string($description)) {
+            $this->merge(['description' => trim($description)]);
+        }
+
         $parts = [];
 
         foreach ((array) $this->input('parts', []) as $line) {
@@ -77,6 +82,7 @@ class StoreServiceReportRequest extends FormRequest
         ];
 
         return [
+            'description' => ['required', 'string', 'min:10'],
             'parts' => ['sometimes', 'array'],
             'parts.*.part_id' => [
                 'nullable',
@@ -95,6 +101,17 @@ class StoreServiceReportRequest extends FormRequest
             'images.after.*' => $imageRule,
             'images.damaged-parts' => ['sometimes', 'array'],
             'images.damaged-parts.*' => $imageRule,
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'description.required' => 'شرح گزارش الزامی است.',
+            'description.min' => 'شرح گزارش باید حداقل ۱۰ نویسه باشد.',
         ];
     }
 
@@ -125,6 +142,11 @@ class StoreServiceReportRequest extends FormRequest
                 }
             }
         });
+    }
+
+    public function reportDescription(): string
+    {
+        return (string) $this->validated('description');
     }
 
     /**

@@ -34,6 +34,7 @@
             class="ui-input {{ $errors->has('mobile') ? 'border-red-500' : '' }}"
             autocomplete="tel"
         >
+        <p class="mt-1 text-xs text-slate-500">همین شماره، نام کاربری ورود به پنل تکنسین است.</p>
         <p id="mobile-error" class="mt-1 text-sm" style="color:#dc2626" @if (! $errors->has('mobile')) hidden @endif>
             {{ $errors->first('mobile') ?: 'شماره همراه باید با ۰۹ شروع شود و ۱۱ رقم باشد.' }}
         </p>
@@ -117,9 +118,9 @@
 
 <fieldset class="ui-fieldset">
     <legend class="ui-legend">مهارت‌ها</legend>
-    @forelse ($skills as $skill)
-        <div>
-            <label class="inline-flex items-center gap-2 text-sm">
+    <div class="ui-check-grid">
+        @forelse ($skills as $skill)
+            <label class="ui-check-pill">
                 <input
                     type="checkbox"
                     name="skill_ids[]"
@@ -129,10 +130,10 @@
                 >
                 {{ $skill->name }}
             </label>
-        </div>
-    @empty
-        <p class="text-sm text-slate-500">مهارتی ثبت نشده است.</p>
-    @endforelse
+        @empty
+            <p class="text-sm text-slate-500">مهارتی ثبت نشده است.</p>
+        @endforelse
+    </div>
 </fieldset>
 
 <script>

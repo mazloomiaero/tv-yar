@@ -33,6 +33,8 @@ class ServiceReportTest extends TestCase
 {
     use RefreshDatabase;
 
+    private const VALID_DESCRIPTION = 'Replaced the compressor and verified cooling.';
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -57,6 +59,7 @@ class ServiceReportTest extends TestCase
 
         $response = $this->actingAs($user)
             ->post(route('technician.reports.store', $context['assignment']), [
+                'description' => self::VALID_DESCRIPTION,
                 'parts' => [
                     [
                         'part_id' => $catalog->id,
@@ -87,18 +90,17 @@ class ServiceReportTest extends TestCase
         $response->assertRedirect(route('technician.reports.show', $report));
 
         $this->assertSame($context['request']->id, $report->service_request_id);
-        $this->assertArrayNotHasKey('diagnosis', $report->getAttributes());
-        $this->assertArrayNotHasKey('notes', $report->getAttributes());
+        $this->assertSame(self::VALID_DESCRIPTION, $report->description);
         $this->assertSame(3, $report->parts()->count());
 
-        $catalogEdited = $report->parts()->where('unit_price', '2100.00')->first();
+        $catalogEdited = $report->parts()->where('quantity', '2.500')->first();
         $this->assertNotNull($catalogEdited);
         $this->assertSame($catalog->id, $catalogEdited->part_id);
         $this->assertSame('Compressor', $catalogEdited->name);
-        $this->assertSame('2.500', (string) $catalogEdited->quantity);
-        $this->assertSame('5250.00', (string) $catalogEdited->total_price);
+        $this->assertSame('2000.00', (string) $catalogEdited->unit_price);
+        $this->assertSame('5000.00', (string) $catalogEdited->total_price);
 
-        $catalogDefault = $report->parts()->where('unit_price', '2000.00')->first();
+        $catalogDefault = $report->parts()->where('quantity', '1.000')->first();
         $this->assertNotNull($catalogDefault);
         $this->assertSame('2000.00', (string) $catalogDefault->total_price);
 
@@ -173,6 +175,102 @@ class ServiceReportTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_tampered_catalog_unit_price_is_replaced_with_the_catalog_price(): void
+    {
+        $user = $this->staffUser(RoleName::Technician);
+        $context = $this->assignedContext($user);
+        $catalog = Part::factory()->create([
+            'name' => 'Fan motor',
+            'default_unit_price' => '1500.50',
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('technician.reports.create', $context['assignment']))
+            ->assertOk()
+            ->assertSee('data-price="1500.50"', false)
+            ->assertSee('name="description"', false);
+
+        $this->actingAs($user)
+            ->post(route('technician.reports.store', $context['assignment']), [
+                'description' => self::VALID_DESCRIPTION,
+                'parts' => [
+                    [
+                        'part_id' => $catalog->id,
+                        'quantity' => '2',
+                        'unit_price' => '1.00',
+                    ],
+                ],
+            ])
+            ->assertRedirect();
+
+        $line = ServiceReport::query()->firstOrFail()->parts()->first();
+        $this->assertNotNull($line);
+        $this->assertSame('1500.50', (string) $line->unit_price);
+        $this->assertSame('3001.00', (string) $line->total_price);
+        $this->assertNotSame('1.00', (string) $line->unit_price);
+    }
+
+    public function test_missing_or_empty_description_is_rejected(): void
+    {
+        $user = $this->staffUser(RoleName::Technician);
+        $context = $this->assignedContext($user);
+        $createUrl = route('technician.reports.create', $context['assignment']);
+        $storeUrl = route('technician.reports.store', $context['assignment']);
+        $parts = [
+            'parts' => [
+                [
+                    'name' => 'Free gasket',
+                    'quantity' => '1',
+                    'unit_price' => '10.00',
+                ],
+            ],
+        ];
+
+        $this->actingAs($user)
+            ->from($createUrl)
+            ->post($storeUrl, $parts)
+            ->assertRedirect($createUrl)
+            ->assertSessionHasErrors('description');
+
+        $this->actingAs($user)
+            ->from($createUrl)
+            ->post($storeUrl, $parts + ['description' => '   '])
+            ->assertRedirect($createUrl)
+            ->assertSessionHasErrors('description');
+
+        $this->actingAs($user)
+            ->from($createUrl)
+            ->post($storeUrl, $parts + ['description' => 'too short'])
+            ->assertRedirect($createUrl)
+            ->assertSessionHasErrors('description');
+
+        $this->assertSame(0, ServiceReport::query()->count());
+    }
+
+    public function test_valid_description_is_stored_on_the_report(): void
+    {
+        $user = $this->staffUser(RoleName::Technician);
+        $context = $this->assignedContext($user);
+        $description = 'Sealed the drain line and confirmed there is no leak.';
+
+        $this->actingAs($user)
+            ->post(route('technician.reports.store', $context['assignment']), [
+                'description' => $description,
+                'parts' => [
+                    [
+                        'name' => 'Free gasket',
+                        'quantity' => '1',
+                        'unit_price' => '10.00',
+                    ],
+                ],
+            ])
+            ->assertRedirect();
+
+        $report = ServiceReport::query()->first();
+        $this->assertNotNull($report);
+        $this->assertSame($description, $report->description);
+    }
+
     public function test_free_text_part_requires_name_and_price(): void
     {
         $user = $this->staffUser(RoleName::Technician);
@@ -181,6 +279,7 @@ class ServiceReportTest extends TestCase
         $this->actingAs($user)
             ->from(route('technician.reports.create', $context['assignment']))
             ->post(route('technician.reports.store', $context['assignment']), [
+                'description' => self::VALID_DESCRIPTION,
                 'parts' => [
                     [
                         'quantity' => '1',

@@ -75,7 +75,7 @@ Numbering: `document_sequences` with `lockForUpdate` on `document_type` + year. 
 
 ### `customers`
 
-`id` BIGINT UNSIGNED; `customer_code` VARCHAR(30) unique customer code; `first_name` VARCHAR(100); `last_name` VARCHAR(100); `mobile` VARCHAR(30) **not Unique**; `mobile_secondary` VARCHAR(30); `email` VARCHAR(150); `national_id` VARCHAR(20) optional; `notes` TEXT; `status` VARCHAR(20); `user_id` BIGINT UNSIGNED optional customer user account.
+`id` BIGINT UNSIGNED; `customer_code` VARCHAR(30) unique customer code; `first_name` VARCHAR(100); `last_name` VARCHAR(100); `mobile` VARCHAR(30) unique among non-deleted rows (Iranian `09#########`); `mobile_secondary` VARCHAR(30); `email` VARCHAR(150); `national_id` VARCHAR(20) optional; `notes` TEXT; `status` VARCHAR(20); `user_id` BIGINT UNSIGNED optional customer user account.
 
 ### `device_types`
 
@@ -107,7 +107,7 @@ Numbering: `document_sequences` with `lockForUpdate` on `document_type` + year. 
 
 ### `service_statuses`
 
-`id` BIGINT UNSIGNED; `name` VARCHAR(150) catalog identifier (Admin ServiceStatus controller). Sample labels in `docs/ARCHITECTURE.md` (main + side). No code/color/order/is_terminal columns.
+`id` BIGINT UNSIGNED; `name` VARCHAR(150) display label (Admin ServiceStatus controller); `code` VARCHAR(50) nullable stable lookup key (unique when set); `is_system` BOOLEAN default false (seed/system rows cannot be deleted). Sample labels in `docs/ARCHITECTURE.md` (main + side). No color/order/`is_terminal` columns. Business lookups use `code`, not `name`.
 
 ### `devices`
 
@@ -123,7 +123,7 @@ Numbering: `document_sequences` with `lockForUpdate` on `document_type` + year. 
 
 ### `invoices`
 
-`id`; `invoice_number` VARCHAR(40); `service_request_id`; `customer_id`; `customer_name` VARCHAR(200) snapshot; `customer_mobile` VARCHAR(30) snapshot; `customer_address` TEXT snapshot; `subtotal` DECIMAL(15,2); `discount` DECIMAL(15,2); `tax` DECIMAL(15,2); `total` DECIMAL(15,2); `status` VARCHAR(30); `issued_at`; `paid_at` DATETIME.
+`id`; `invoice_number` VARCHAR(40); `service_request_id` unique (one invoice per service request); `customer_id`; `customer_name` VARCHAR(200) snapshot; `customer_mobile` VARCHAR(30) snapshot; `customer_address` TEXT snapshot; `subtotal` DECIMAL(15,2); `discount` DECIMAL(15,2); `tax` DECIMAL(15,2); `total` DECIMAL(15,2); `status` VARCHAR(30); `issued_at`; `paid_at` DATETIME.
 
 ### `payments`
 
@@ -257,14 +257,16 @@ Migration: `2026_09_11_150000_add_auth_rbac_identifier_columns.php`.
 
 `device_types` and `brands` have **no column list** in the architecture document. Admin DeviceType/Brand screens still need a catalog identifier. Source examples of type names: TV, Air Conditioner, Mobile (`docs/domains/custom-fields.md`). No other catalog columns (code, status, IMEI, screen size, …).
 
-`service_types` and `service_statuses` likewise have **no column list**. Admin ServiceType/ServiceStatus screens still need a catalog identifier. Sample status labels: New, Waiting for Contact, Waiting for Assignment, Assigned, Technician Confirmed, On the Way, On Site, Inspecting, Repairing, Repaired, Closed; side: Cancelled, Customer Absent, Cannot Repair, Revisit Needed, Transfer to Workshop (`docs/ARCHITECTURE.md`). No code, color, order, or `is_terminal` columns.
+`service_types` and `service_statuses` likewise had **no column list** in the original architecture dictionary. Admin ServiceType/ServiceStatus screens still need a catalog identifier. Sample status labels: New, Waiting for Contact, Waiting for Assignment, Assigned, Technician Confirmed, On the Way, On Site, Inspecting, Repairing, Repaired, Closed; side: Cancelled, Customer Absent, Cannot Repair, Revisit Needed, Transfer to Workshop (`docs/ARCHITECTURE.md`). No color, order, or `is_terminal` columns. Stable `code` + `is_system` were added after production audit so renames/deletes cannot break request creation.
 
 | Table | Column | Why |
 |---|---|---|
 | `device_types` | `name` VARCHAR(150) | Identifier for Admin catalog and `devices.device_type_id`. |
 | `brands` | `name` VARCHAR(150) | Identifier for Admin catalog and `devices.brand_id`. |
 | `service_types` | `name` VARCHAR(150) | Identifier for Admin catalog and `service_requests.service_type_id`. |
-| `service_statuses` | `name` VARCHAR(150) | Identifier for Admin catalog and `service_requests.status_id`. |
+| `service_statuses` | `name` VARCHAR(150) | Display label for Admin catalog and UI. |
+| `service_statuses` | `code` VARCHAR(50) nullable | Stable lookup key (e.g. `new`); unique when set. |
+| `service_statuses` | `is_system` BOOLEAN | Protects seeded/system statuses from deletion. |
 
 Pivot uniqueness (link tables, CASCADE already migrated): unique `(service_type_id, device_type_id)` on `service_type_device_types`; unique `(service_type_id, service_status_id)` on `service_type_statuses`.
 
@@ -320,22 +322,25 @@ Migration: `2026_09_11_190000_add_service_request_number_unique_and_status_histo
 
 ### Service report part and image columns (narrative names + storage folders)
 
-`service_report_parts` line fields were named in this file’s narrative notes without a typed dictionary. CreateServiceReport still needs those fields. Types follow project standards (quantity DECIMAL(12,3), money DECIMAL(15,2)). `part_id` stays nullable (catalog or free-text line). **No** `is_confirmed` — confirmation is the later invoice step (`docs/domains/invoice.md`). Catalog `unit_price` is copied from `parts.default_unit_price` then may be edited; `total_price` is computed in the Action (quantity × unit_price).
+`service_report_parts` line fields were named in this file’s narrative notes without a typed dictionary. CreateServiceReport still needs those fields. Types follow project standards (quantity DECIMAL(12,3), money DECIMAL(15,2)). `part_id` stays nullable (catalog or free-text line). **No** `is_confirmed` — confirmation is the later invoice step (`docs/domains/invoice.md`). For catalog lines (`part_id` set), `unit_price` is always taken from `parts.default_unit_price` server-side (client price ignored). Free-text lines keep a client-supplied `unit_price`. `total_price` is computed in the Action (quantity × unit_price).
 
-`service_reports` has **no** body dictionary. A report is `service_request_id` + parts + images. Do not add diagnosis/result/notes columns.
+`service_reports` stores one required work narrative: `description` TEXT (min length enforced in Form Request). Do **not** add a diagnosis/result/notes trio — only this single body field.
 
 `service_report_images` has **no** source field dictionary. Storage folders in `docs/ARCHITECTURE.md` are `problems`, `before`, `after`, `damaged-parts`. Files live under `storage/app/public/service-reports/{kind}/`. The database stores path + folder kind only (not file bytes). Upload type/size is validated in the Form Request (jpeg/jpg/png/webp, max 5120 KB) — those limits are not in the architecture dictionary.
 
 | Table | Column | Why |
 |---|---|---|
+| `service_reports` | `description` TEXT | Required work description written by the technician. |
 | `service_report_parts` | `name` VARCHAR(150) | Line label (catalog snapshot or free-text name). |
 | `service_report_parts` | `quantity` DECIMAL(12,3) | Quantity standard. |
-| `service_report_parts` | `unit_price` DECIMAL(15,2) | Money standard; editable from catalog default. |
+| `service_report_parts` | `unit_price` DECIMAL(15,2) | Money standard; catalog lines locked to `parts.default_unit_price`. |
 | `service_report_parts` | `total_price` DECIMAL(15,2) | Computed in Action; do not trust client totals. |
 | `service_report_images` | `path` VARCHAR(255) | Relative path on the public disk. |
 | `service_report_images` | `kind` VARCHAR(30) | Folder kind: `problems` / `before` / `after` / `damaged-parts`. |
 
 Migration: `2026_09_11_210000_add_service_report_part_and_image_columns.php`.
+
+Migration: `2026_09_11_262000_add_description_to_service_reports_table.php`.
 
 ### Device reception receipt columns (narrative concerns; types unspecified in source)
 
@@ -362,6 +367,8 @@ Migration: `2026_09_11_220000_add_device_reception_receipt_columns.php`.
 
 `invoices.invoice_number` is unique (source: unique document numbers / `INV-1405-000001` pattern).
 
+`invoices.service_request_id` is unique (one invoice per service request; CreateInvoice rejects duplicates and surfaces the existing invoice number).
+
 `customer_addresses` still has no street/city columns. `invoices.customer_address` is snapshotted as whatever address text exists (currently empty).
 
 | Table | Column | Why |
@@ -373,6 +380,12 @@ Migration: `2026_09_11_220000_add_device_reception_receipt_columns.php`.
 | `invoice_items` | `total` DECIMAL(15,2) | Computed in InvoiceService; do not trust client totals. |
 
 Migration: `2026_09_11_230000_add_invoice_item_snapshot_columns_and_invoice_number_unique.php`.
+
+Migration: `2026_09_11_263000_add_unique_service_request_id_to_invoices.php`.
+
+Migration: `2026_09_11_261000_add_code_and_is_system_to_service_statuses.php`.
+
+Migration: `2026_09_11_264000_add_customers_mobile_active_unique_index.php`.
 
 ### Feedback score/comment and notification name (architecture narrative; no typed dictionary)
 
@@ -391,5 +404,5 @@ Migration: `2026_09_11_240000_add_feedback_score_comment_and_notification_name.p
 ### Gaps (named in source, types missing — not migrated as business columns)
 
 - **`document_sequences`:** names migrated; `document_type`/`prefix` use Laravel `string` (255); `year`/`current_number` use `unsignedInteger` — widths were not in the source.
-- Tables listed under “no column list” have **no** name/code/status/value columns until the architecture dictionary is updated, except the auth identifier columns recorded above (`users.username`, `roles.name`, `permissions.name`), the catalog identifiers (`device_types.name`, `brands.name`, `service_types.name`, `service_statuses.name`), the skill/technician identifiers (`skills.name`, `technicians.name`, optional `technicians.user_id`), the custom-field identifier/value columns (`custom_fields.name`, `custom_field_options.name`, `device_custom_field_values.value`, `service_request_custom_field_values.value`), the status-history columns (`service_status_history.service_status_id`, `service_status_history.changed_by`), and the service-report image path/kind columns (`service_report_images.path`, `service_report_images.kind`). `service_reports` still has no body columns.
+- Tables listed under “no column list” have **no** name/code/status/value columns until the architecture dictionary is updated, except the auth identifier columns recorded above (`users.username`, `roles.name`, `permissions.name`), the catalog identifiers (`device_types.name`, `brands.name`, `service_types.name`, `service_statuses.name` plus `service_statuses.code` / `is_system`), the skill/technician identifiers (`skills.name`, `technicians.name`, optional `technicians.user_id`), the custom-field identifier/value columns (`custom_fields.name`, `custom_field_options.name`, `device_custom_field_values.value`, `service_request_custom_field_values.value`), the status-history columns (`service_status_history.service_status_id`, `service_status_history.changed_by`), the service-report image path/kind columns (`service_report_images.path`, `service_report_images.kind`), and `service_reports.description`.
 - **`service_assignments.status` / `technician_response`:** NOT NULL VARCHAR(30) with **no** source dictionary. Insert placeholders `assigned` / `unspecified` are recorded above; they are not a workflow engine.

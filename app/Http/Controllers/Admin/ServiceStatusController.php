@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exceptions\CatalogDeletionException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreServiceStatusRequest;
 use App\Http\Requests\Admin\UpdateServiceStatusRequest;
@@ -59,7 +60,13 @@ class ServiceStatusController extends Controller
 
     public function destroy(ServiceStatus $serviceStatus): RedirectResponse
     {
-        $serviceStatus->delete();
+        try {
+            $serviceStatus->delete();
+        } catch (CatalogDeletionException $exception) {
+            return redirect()
+                ->back()
+                ->withErrors(['delete' => $exception->getMessage()]);
+        }
 
         return redirect()
             ->route('admin.service-statuses.index')

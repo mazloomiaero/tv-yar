@@ -11,16 +11,52 @@ use Illuminate\Database\Seeder;
 class ServiceStatusSeeder extends Seeder
 {
     /**
-     * Seed documented main, side, and workshop-path status names.
+     * Seed documented main, side, and workshop-path statuses.
+     * Existing display names are kept once a stable code is set.
      */
     public function run(): void
     {
-        foreach (SampleServiceStatus::englishToPersian() as $english => $persian) {
-            ServiceStatus::query()->where('name', $english)->update(['name' => $persian]);
-        }
+        foreach (SampleServiceStatus::definitions() as $definition) {
+            $existing = ServiceStatus::query()->where('code', $definition['code'])->first();
 
-        foreach (SampleServiceStatus::names() as $name) {
-            ServiceStatus::query()->firstOrCreate(['name' => $name]);
+            if ($existing instanceof ServiceStatus) {
+                if (! $existing->is_system) {
+                    $existing->is_system = true;
+                    $existing->save();
+                }
+
+                continue;
+            }
+
+            $legacy = ServiceStatus::query()
+                ->whereNull('code')
+                ->where('name', $definition['name'])
+                ->orderBy('id')
+                ->first();
+
+            if (! $legacy instanceof ServiceStatus) {
+                $legacy = ServiceStatus::query()
+                    ->whereNull('code')
+                    ->where('name', $definition['english'])
+                    ->orderBy('id')
+                    ->first();
+            }
+
+            if ($legacy instanceof ServiceStatus) {
+                $legacy->forceFill([
+                    'name' => $definition['name'],
+                    'code' => $definition['code'],
+                    'is_system' => true,
+                ])->save();
+
+                continue;
+            }
+
+            ServiceStatus::query()->create([
+                'name' => $definition['name'],
+                'code' => $definition['code'],
+                'is_system' => true,
+            ]);
         }
     }
 }

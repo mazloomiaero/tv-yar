@@ -1,16 +1,17 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('content')
-    <x-page-header title="ثبت نوع خدمت" />
+    <x-page-header title="ثبت نوع خدمت" subtitle="نوع خدمت و تنظیمات مرتبط." />
 
-    <x-card>
-        <form method="POST" action="{{ route('admin.service-types.store') }}" class="space-y-4">
-            @csrf
+    <form method="POST" action="{{ route('admin.service-types.store') }}">
+        @csrf
+        <x-form-shell kicker="گردش کار" title="ثبت نوع خدمت" subtitle="نوع خدمت و تنظیمات مرتبط.">
             @include('admin.service-types._form', ['serviceType' => null])
-            <div class="flex gap-2">
+
+            <x-slot:actions>
                 <x-button>ثبت</x-button>
                 <x-button variant="secondary" href="{{ route('admin.service-types.index') }}">بازگشت</x-button>
-            </div>
-        </form>
-    </x-card>
+            </x-slot:actions>
+        </x-form-shell>
+    </form>
 @endsection

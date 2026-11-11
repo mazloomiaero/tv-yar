@@ -9,15 +9,17 @@
         </x-slot:actions>
     </x-page-header>
 
-    <x-card class="mb-6">
-        <form method="GET" action="{{ \App\Support\OpsRoute::to('customers.search') }}" class="flex flex-col gap-4 sm:flex-row sm:items-end">
-            <div class="flex-1">
+    <form method="GET" action="{{ \App\Support\OpsRoute::to('customers.search') }}" class="mb-4">
+        <x-form-shell kicker="جستجو" title="پیدا کردن مشتری" subtitle="شماره همراه یا نام را وارد کنید.">
+            <div>
                 <label for="q" class="ui-label">شماره همراه، نام یا نام خانوادگی</label>
                 <input id="q" type="text" name="q" value="{{ old('q', $query) }}" maxlength="150" autofocus class="ui-input">
             </div>
-            <x-button>جستجو</x-button>
-        </form>
-    </x-card>
+            <x-slot:actions>
+                <x-button>جستجو</x-button>
+            </x-slot:actions>
+        </x-form-shell>
+    </form>
 
     @if ($searched)
         @if ($customers->isEmpty())

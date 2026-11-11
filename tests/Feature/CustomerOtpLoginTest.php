@@ -38,16 +38,18 @@ class CustomerOtpLoginTest extends TestCase
         $this->assertFalse(Cache::has(app(CustomerOtpStore::class)->key('09129999999')));
     }
 
-    public function test_ambiguous_mobile_does_not_store_a_code(): void
+    public function test_soft_deleted_customer_with_same_mobile_does_not_block_otp(): void
     {
-        Customer::factory()->create(['mobile' => '09121111111']);
-        Customer::factory()->create(['mobile' => '09121111111']);
+        $deleted = Customer::factory()->create(['mobile' => '09121111111']);
+        $deleted->delete();
+
+        $active = Customer::factory()->create(['mobile' => '09121111111']);
 
         $this->post(route('customer.login.otp'), [
-            'mobile' => '09121111111',
+            'mobile' => $active->mobile,
         ])->assertRedirect(route('customer.login.verify'));
 
-        $this->assertFalse(Cache::has(app(CustomerOtpStore::class)->key('09121111111')));
+        $this->assertTrue(Cache::has(app(CustomerOtpStore::class)->key($active->mobile)));
     }
 
     public function test_sending_otp_for_a_unique_mobile_stores_a_hashed_code(): void

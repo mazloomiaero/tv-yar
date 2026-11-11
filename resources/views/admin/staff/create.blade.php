@@ -1,16 +1,17 @@
 @extends('layouts.admin')
 
 @section('content')
-    <x-page-header title="ثبت کارمند" />
+    <x-page-header title="ثبت کارمند" subtitle="حساب ورود کارکنان داخلی با نقش مناسب." />
 
-    <x-card>
-        <form method="POST" action="{{ route('admin.staff.store') }}" class="space-y-4">
-            @csrf
+    <form method="POST" action="{{ route('admin.staff.store') }}">
+        @csrf
+        <x-form-shell kicker="کاربران" title="ثبت کارمند" subtitle="نام، نقش، نام کاربری و رمز عبور را وارد کنید.">
             @include('admin.staff._form', ['staff' => null])
-            <div class="flex gap-2">
+
+            <x-slot:actions>
                 <x-button>ثبت</x-button>
                 <x-button variant="secondary" href="{{ route('admin.staff.index') }}">بازگشت</x-button>
-            </div>
-        </form>
-    </x-card>
+            </x-slot:actions>
+        </x-form-shell>
+    </form>
 @endsection

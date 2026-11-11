@@ -22,14 +22,15 @@ final class CreateServiceReport
      * @param  list<array{part_id?: int|null, name?: string|null, quantity: string, unit_price?: string|null}>  $parts
      * @param  array<string, list<UploadedFile>>  $imagesByKind
      */
-    public function execute(ServiceRequest $serviceRequest, array $parts, array $imagesByKind): ServiceReport
+    public function execute(ServiceRequest $serviceRequest, array $parts, array $imagesByKind, string $description): ServiceReport
     {
         $storedPaths = [];
 
         try {
-            $report = DB::transaction(function () use ($serviceRequest, $parts, $imagesByKind, &$storedPaths): ServiceReport {
+            $report = DB::transaction(function () use ($serviceRequest, $parts, $imagesByKind, $description, &$storedPaths): ServiceReport {
                 $report = ServiceReport::query()->create([
                     'service_request_id' => $serviceRequest->id,
+                    'description' => $description,
                 ]);
 
                 foreach ($parts as $line) {
@@ -92,15 +93,11 @@ final class CreateServiceReport
                 throw new InvalidArgumentException('Part was not found.');
             }
 
-            $unitPrice = isset($line['unit_price']) && $line['unit_price'] !== null && $line['unit_price'] !== ''
-                ? (string) $line['unit_price']
-                : (string) $part->default_unit_price;
-
             return [
                 'part_id' => $part->id,
                 'name' => $part->name,
                 'quantity' => $quantity,
-                'unit_price' => $this->money($unitPrice),
+                'unit_price' => $this->money((string) $part->default_unit_price),
             ];
         }
 

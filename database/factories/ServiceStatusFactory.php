@@ -19,6 +19,8 @@ class ServiceStatusFactory extends Factory
     {
         return [
             'name' => fake()->unique()->words(2, true),
+            'code' => null,
+            'is_system' => false,
         ];
     }
 }

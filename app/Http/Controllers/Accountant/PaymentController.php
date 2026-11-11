@@ -48,10 +48,12 @@ class PaymentController extends Controller
         Payment $payment,
         PaymentService $payments,
     ): RedirectResponse {
-        $payments->confirmManual($payment);
+        $result = $payments->confirmManual($payment);
 
         return redirect()
             ->route('accountant.payments.show', $payment)
-            ->with('status', 'Payment confirmed.');
+            ->with('status', $result['alreadyConfirmed']
+                ? 'Payment already confirmed.'
+                : 'Payment confirmed.');
     }
 }

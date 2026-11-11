@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TV Yar — ساختار، ارتباطات، فرم‌ها و فرایندها</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #14201c;
+      --muted: #4a5c55;
+      --line: #d7e0db;
+      --paper: #f7f4ee;
+      --card: #fffdf9;
+      --accent: #0f6b5c;
+      --accent-soft: #d9efe9;
+      --warn: #8a4b12;
+      --warn-soft: #f4e4d2;
+      --code: #1e2a26;
+      --shadow: 0 1px 0 rgba(20, 32, 28, 0.04), 0 12px 32px rgba(20, 32, 28, 0.06);
+      --radius: 14px;
+      --max: 1080px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 500px at 10% -10%, #e7f3ef 0%, transparent 55%),
+        radial-gradient(900px 400px at 100% 0%, #efe8db 0%, transparent 50%),
+        var(--paper);
+      font-family: "Vazirmatn", "IBM Plex Sans", sans-serif;
+      line-height: 1.75;
+      font-size: 16px;
+    }
+
+    .wrap { width: min(var(--max), calc(100% - 2rem)); margin: 0 auto; }
+
+    header.hero {
+      padding: 3.5rem 0 2.5rem;
+      border-bottom: 1px solid var(--line);
+    }
+    .eyebrow {
+      display: inline-flex;
+      gap: .5rem;
+      align-items: center;
+      color: var(--accent);
+      font-weight: 600;
+      font-size: .9rem;
+      letter-spacing: .02em;
+    }
+    .eyebrow::before {
+      content: "";
+      width: .55rem; height: .55rem;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+    h1 {
+      margin: .7rem 0 .6rem;
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      line-height: 1.25;
+      font-weight: 700;
+    }
+    .lede {
+      max-width: 46rem;
+      color: var(--muted);
+      font-size: 1.05rem;
+      margin: 0;
+    }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .6rem;
+      margin-top: 1.4rem;
+    }
+    .chip {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: .35rem .8rem;
+      font-size: .85rem;
+      color: var(--muted);
+      box-shadow: var(--shadow);
+    }
+
+    nav.toc {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      backdrop-filter: blur(10px);
+      background: rgba(247, 244, 238, .88);
+      border-bottom: 1px solid var(--line);
+    }
+    nav.toc .wrap {
+      display: flex;
+      gap: .55rem;
+      overflow-x: auto;
+      padding: .75rem 0;
+    }
+    nav.toc a {
+      white-space: nowrap;
+      text-decoration: none;
+      color: var(--muted);
+      font-size: .86rem;
+      padding: .35rem .7rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+    }
+    nav.toc a:hover {
+      color: var(--accent);
+      border-color: var(--line);
+      background: var(--card);
+    }
+
+    main { padding: 2rem 0 4rem; }
+    section {
+      margin: 2.4rem 0;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 1.5rem 1.4rem 1.6rem;
+      box-shadow: var(--shadow);
+    }
+    section h2 {
+      margin: 0 0 .9rem;
+      font-size: 1.35rem;
+      padding-bottom: .7rem;
+      border-bottom: 1px solid var(--line);
+    }
+    section h3 {
+      margin: 1.4rem 0 .55rem;
+      font-size: 1.05rem;
+      color: var(--accent);
+    }
+    p { margin: .55rem 0; color: var(--ink); }
+    .muted { color: var(--muted); }
+    ul, ol { margin: .4rem 0 .8rem; padding-inline-start: 1.2rem; }
+    li { margin: .25rem 0; }
+    code, .mono {
+      font-family: "IBM Plex Sans", ui-monospace, monospace;
+      font-size: .92em;
+      direction: ltr;
+      unicode-bidi: isolate;
+    }
+    code {
+      background: #eef3f0;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: .05rem .35rem;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+    }
+    @media (max-width: 860px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: #fbfaf6;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 1rem;
+    }
+    .card h4 {
+      margin: 0 0 .45rem;
+      font-size: .98rem;
+    }
+    .card p, .card li { font-size: .94rem; color: var(--muted); }
+
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .45rem;
+      align-items: center;
+      margin: .8rem 0 1rem;
+    }
+    .flow span {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-radius: 999px;
+      padding: .35rem .75rem;
+      font-size: .86rem;
+      font-weight: 600;
+    }
+    .flow i {
+      font-style: normal;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .pipeline {
+      display: grid;
+      gap: .45rem;
+      margin: 1rem 0;
+    }
+    .pipeline div {
+      border: 1px dashed var(--line);
+      border-radius: 10px;
+      padding: .65rem .85rem;
+      background: #fbfaf6;
+      font-size: .95rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .92rem;
+      margin: .7rem 0 1rem;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: .55rem .6rem;
+      vertical-align: top;
+      text-align: right;
+    }
+    th {
+      background: #eef4f1;
+      font-weight: 600;
+    }
+    td .en { direction: ltr; unicode-bidi: isolate; display: inline-block; }
+
+    .callout {
+      border-radius: 12px;
+      padding: .9rem 1rem;
+      margin: 1rem 0;
+      border: 1px solid var(--line);
+    }
+    .callout.info { background: var(--accent-soft); border-color: #b7d8cf; }
+    .callout.warn { background: var(--warn-soft); border-color: #e2c49d; color: var(--warn); }
+    .callout strong { display: block; margin-bottom: .25rem; }
+
+    .er {
+      direction: ltr;
+      text-align: left;
+      font-family: "IBM Plex Sans", monospace;
+      font-size: .84rem;
+      background: #16221e;
+      color: #d7ebe4;
+      border-radius: 12px;
+      padding: 1rem 1.1rem;
+      overflow-x: auto;
+      line-height: 1.55;
+      white-space: pre;
+    }
+
+    footer {
+      padding: 1.5rem 0 2.5rem;
+      color: var(--muted);
+      font-size: .88rem;
+      border-top: 1px solid var(--line);
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <div class="eyebrow">مستند عارضه‌یابی معماری — برای بررسی توسط Claude</div>
+      <h1>TV Yar / Field Service System<br>ساختار، ارتباطات، فرم‌ها و فرایندها</h1>
+      <p class="lede">
+        این سند وضعیت فعلی ریپوی Laravel را خلاصه می‌کند تا بتوان ساختار را عارضه‌یابی کرد،
+        نقاط تنش را دید، و پیشنهاد بهبود داد — بدون اختراع ماژول‌های خارج از معماری منبع.
+      </p>
+      <div class="meta">
+        <span class="chip">Laravel 13 · PHP ^8.3 · MySQL utf8mb4</span>
+        <span class="chip">۴۱ جدول · ۶ پنل · نصب مستقل per company</span>
+        <span class="chip">ریپو: mazloomiaero/tv-yar</span>
+        <span class="chip">پروداکشن: app.tv-yar.com</span>
+      </div>
+    </div>
+  </header>
+
+  <nav class="toc" aria-label="فهرست">
+    <div class="wrap">
+      <a href="#product">محصول</a>
+      <a href="#principles">اصول</a>
+      <a href="#pipeline">خط لوله</a>
+      <a href="#domains">دامنه‌ها</a>
+      <a href="#relations">روابط</a>
+      <a href="#panels">پنل‌ها</a>
+      <a href="#process">فرایند اصلی</a>
+      <a href="#forms">فرم‌ها</a>
+      <a href="#actions">Actions / Services</a>
+      <a href="#auth">احراز هویت</a>
+      <a href="#finance">مالی</a>
+      <a href="#status">وضعیت‌ها</a>
+      <a href="#oos">خارج از محدوده</a>
+      <a href="#review">سؤالات عارضه‌یابی</a>
+    </div>
+  </nav>
+
+  <main class="wrap">
+    <section id="product">
+      <h2>۱) محصول چیست؟</h2>
+      <p>
+        سامانهٔ <strong>مدیریت خدمات فنی و تعمیرات میدانی</strong> (Field Service Management).
+        سناریوی اول: تعمیر تلویزیون (TV Yar)، ولی معماری باید برای لوازم خانگی، کولر، موبایل، لپ‌تاپ، تجهیزات صنعتی و نصب هم قابل استفاده باشد.
+      </p>
+      <div class="grid-2">
+        <div class="card">
+          <h4>در محدوده</h4>
+          <ul>
+            <li>شرکت / تنظیمات / کاربران / نقش‌ها / مجوزها / شعب</li>
+            <li>مشتری + چند آدرس، دستگاه، نوع دستگاه، برند</li>
+            <li>نوع خدمت، فیلد سفارشی، وضعیت خدمت</li>
+            <li>درخواست خدمت، ارجاع تکنسین، گزارش، کارگاه</li>
+            <li>فاکتور، پرداخت آنلاین/دستی، بازخورد، اعلان</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>خارج از محدوده (منبع معماری)</h4>
+          <ul>
+            <li>چندمستأجری واقعی با <code>tenant_id</code></li>
+            <li>انبار / موجودی / خرید</li>
+            <li>GPS / مسیر‌یابی / اپ Native</li>
+            <li>حسابداری کامل / حقوق و دستمزد</li>
+            <li>Work Order / Appointment / Checklist جدا</li>
+            <li>موتور گردش‌کار پیچیده</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout info">
+        <strong>مدل نصب</strong>
+        هر شرکت یک نصب Laravel + یک دیتابیس مستقل دارد. جدول <code>company</code> هویت همان نصب است، نه کلید چندشرکتی روی ردیف‌های کسب‌وکار.
+      </div>
+    </section>
+
+    <section id="principles">
+      <h2>۲) اصول معماری اجباری</h2>
+      <ul>
+        <li>کنترلر نازک؛ منطق کسب‌وکار در <strong>Action / Service</strong>.</li>
+        <li>ورودی فقط از <strong>Form Request</strong>.</li>
+        <li>دسترسی با <strong>Permission + Policy</strong> (نه فقط permission).</li>
+        <li>شماره‌های نمایشی از <code>document_sequences</code> با تراکنش + <code>lockForUpdate</code> (نه <code>id</code>).</li>
+        <li>تاریخچهٔ مالی و خدمت به‌صورت فیزیکی پاک نمی‌شود.</li>
+        <li>شعبه مفهوم داخلی یک شرکت است؛ <code>branch_id</code> همه‌جا نیست (روی ارجاع nullable است).</li>
+        <li>ویژگی‌های صنعت‌محور دستگاه = Custom Field، نه ستون اضافه روی <code>devices</code>.</li>
+        <li>موفقیت درگاه فقط بعد از <strong>Verify واقعی</strong> معتبر است.</li>
+      </ul>
+    </section>
+
+    <section id="pipeline">
+      <h2>۳) خط لوله درخواست</h2>
+      <div class="pipeline">
+        <div>HTTP Request (Web الان؛ API آینده روی همان Action/Service)</div>
+        <div>Form Request → اعتبارسنجی ورودی</div>
+        <div>Controller → authorize + یک فراخوانی Action/Service</div>
+        <div>Action / Service → قواعد کسب‌وکار و تراکنش</div>
+        <div>Model → persistence / relations / casts</div>
+        <div>Event → Listener / Job / Notification / SMS / History</div>
+      </div>
+      <p class="muted">مسیرهای پنل‌ها جدا هستند: <code>admin.php</code>، <code>operator.php</code>، <code>technical.php</code>، <code>accountant.php</code>، <code>technician.php</code>، <code>customer.php</code>، به‌همراه <code>auth.php</code>.</p>
+    </section>
+
+    <section id="domains">
+      <h2>۴) دامنه‌های منطقی (یک DB، مرز ذهنی)</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h4>Foundation</h4>
+          <p><code>company</code>، <code>settings</code>، <code>users</code>، <code>roles</code>، <code>permissions</code>، <code>branches</code>، <code>document_sequences</code></p>
+        </div>
+        <div class="card">
+          <h4>Customer &amp; Device</h4>
+          <p><code>customers</code>، <code>customer_addresses</code>، <code>devices</code>، <code>device_types</code>، <code>brands</code></p>
+        </div>
+        <div class="card">
+          <h4>Service operations</h4>
+          <p>انواع خدمت/وضعیت، درخواست، ارجاع، تکنسین/مهارت، گزارش خدمت</p>
+        </div>
+        <div class="card">
+          <h4>Workshop</h4>
+          <p><code>device_receptions</code> ادامهٔ همان Service Request است، نه زیرسیستم جدا</p>
+        </div>
+        <div class="card">
+          <h4>Financial</h4>
+          <p><code>invoices</code>، <code>invoice_items</code>، <code>payments</code>، <code>payment_transactions</code></p>
+        </div>
+        <div class="card">
+          <h4>Support</h4>
+          <p>custom fields، notifications، feedback، گزارش مدیریتی</p>
+        </div>
+      </div>
+      <div class="callout warn">
+        <strong>قاعده مرزی</strong>
+        دامنهٔ پایین‌تر نباید Verify درگاه را دوباره پیاده کند. مالی از قرارداد عملیاتی (گزارش قطعات تأییدشده) مصرف می‌کند، نه بازنویسی عملیات.
+      </div>
+    </section>
+
+    <section id="relations">
+      <h2>۵) ارتباطات هسته‌ای (خلاصه ER)</h2>
+      <pre class="er">Customer 1──* Address
+Customer 1──* Device ── Type / Brand
+Customer 1──* ServiceRequest ── Device / Address / ServiceType / Status
+ServiceRequest 1──* Assignment ── Technician (manual; is_suggested)
+ServiceRequest 1──* StatusHistory
+ServiceRequest 1──0..1+ ServiceReport ── Parts / Images
+ServiceRequest 1──0..1+ DeviceReception (workshop)
+ServiceReportParts (confirmed) ──▶ InvoiceItems
+ServiceRequest / Invoice ──* Payment ──? PaymentTransaction (gateway)
+ServiceRequest ── Feedback
+CustomField ── DeviceType | ServiceType ── Values (non-polymorphic)</pre>
+      <h3>قواعد FK حذف</h3>
+      <table>
+        <thead><tr><th>نوع رابطه</th><th>رفتار</th></tr></thead>
+        <tbody>
+          <tr><td>Pivot / لینک</td><td><code>CASCADE</code></td></tr>
+          <tr><td>موجودیت کسب‌وکار</td><td><code>RESTRICT</code> (تاریخچه نشکند)</td></tr>
+          <tr><td>کاربر / بازیگر</td><td><code>SET NULL</code></td></tr>
+        </tbody>
+      </table>
+      <p class="muted">Soft delete برای داده‌های پایه (کاربر، مشتری، آدرس، دستگاه، کاتالوگ‌ها، تکنسین، شعبه، قطعه، …). درخواست خدمت / گزارش / فاکتور / پرداخت فیزیکی پاک نمی‌شوند.</p>
+    </section>
+
+    <section id="panels">
+      <h2>۶) شش پنل و مسئولیت</h2>
+      <div class="grid-3">
+        <div class="card">
+          <h4>Admin / Manager</h4>
+          <p>کارکنان، تکنسین، مهارت، شعبه، نوع دستگاه، برند، نوع خدمت، وضعیت، فیلد سفارشی، قطعات، داشبورد</p>
+        </div>
+        <div class="card">
+          <h4>Operator</h4>
+          <p>جستجو/ثبت مشتری، دستگاه، ایجاد درخواست، ارجاع، تغییر وضعیت، بستن، تقویم ارجاع، بازخورد</p>
+        </div>
+        <div class="card">
+          <h4>Technical Supervisor</h4>
+          <p>نظارت درخواست‌ها، دریافت/تحویل کارگاه روی همان درخواست</p>
+        </div>
+        <div class="card">
+          <h4>Accountant</h4>
+          <p>صدور فاکتور، تأیید پرداخت دستی، گزارش مالی</p>
+        </div>
+        <div class="card">
+          <h4>Technician</h4>
+          <p>ارجاع‌های من، ثبت گزارش خدمت، دریافت پرداخت دستی در محل</p>
+        </div>
+        <div class="card">
+          <h4>Customer</h4>
+          <p>پروفایل، فاکتور، پرداخت درگاه، رسید پذیرش، بازخورد</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="process">
+      <h2>۷) فرایند اصلی کسب‌وکار</h2>
+      <div class="flow">
+        <span>مشتری</span><i>←</i>
+        <span>دستگاه</span><i>←</i>
+        <span>درخواست خدمت</span><i>←</i>
+        <span>ارجاع</span><i>←</i>
+        <span>بازدید/تشخیص</span><i>←</i>
+        <span>تعمیر</span><i>←</i>
+        <span>گزارش</span><i>←</i>
+        <span>فاکتور</span><i>←</i>
+        <span>پرداخت</span><i>←</i>
+        <span>بازخورد</span>
+      </div>
+
+      <h3>گام‌های اپراتور برای ایجاد درخواست</h3>
+      <ol>
+        <li>جستجوی مشتری با موبایل</li>
+        <li>ایجاد مشتری در صورت نبود</li>
+        <li>انتخاب یا ایجاد دستگاه (+ فیلدهای سفارشی نوع دستگاه)</li>
+        <li>انتخاب نوع خدمت و آدرس</li>
+        <li>شرح مشکل، اولویت، بازهٔ زمانی ترجیحی</li>
+        <li>ارجاع تکنسین در صورت نیاز (پیشنهاد سیستم + انتخاب نهایی دستی)</li>
+        <li>ذخیره با وضعیت اولیه و شماره <code>SR-…</code></li>
+      </ol>
+
+      <h3>کانال‌های ثبت</h3>
+      <p><code>website</code> · <code>phone</code> · <code>walk-in</code> · API آینده (بدون قرارداد REST فعلی در منبع)</p>
+
+      <h3>تقویم</h3>
+      <p>جدول مستقل <code>calendars</code> وجود ندارد. تقویم از <code>service_assignments</code> مشتق می‌شود.</p>
+    </section>
+
+    <section id="forms">
+      <h2>۸) فهرست فرم‌ها / Form Requests (وضعیت فعلی کد)</h2>
+
+      <h3>Auth</h3>
+      <table>
+        <thead><tr><th>فرم</th><th>هدف</th></tr></thead>
+        <tbody>
+          <tr><td><span class="en">LoginRequest</span></td><td>ورود کارکنان (username/password)</td></tr>
+          <tr><td><span class="en">SendCustomerOtpRequest / VerifyCustomerOtpRequest</span></td><td>OTP مشتری</td></tr>
+          <tr><td>ورود رمز مشتری</td><td>مسیر password جدا برای پورتال مشتری (علاوه بر OTP)</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Admin — کاتالوگ و پایه</h3>
+      <table>
+        <thead><tr><th>موجودیت</th><th>Store / Update</th><th>نکته فرم UI</th></tr></thead>
+        <tbody>
+          <tr><td>Staff</td><td><span class="en">Store/UpdateStaffUserRequest</span></td><td>نام/نام‌خانوادگی، موبایل ۱۱ رقمی با ۰۹، نقش، یوزر، رمز+تکرار با چشم</td></tr>
+          <tr><td>Technician</td><td><span class="en">Store/UpdateTechnicianRequest</span></td><td>نام، موبایل، شعبه، رمز، مهارت‌ها</td></tr>
+          <tr><td>Branch / Brand / DeviceType / Skill / Part / ServiceStatus / ServiceType / CustomField</td><td>جفت Store/Update مربوطه</td><td>CRUD استاندارد کاتالوگ؛ وضعیت شعبه فعال/غیرفعال</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Operator</h3>
+      <table>
+        <thead><tr><th>فرم</th><th>هدف</th></tr></thead>
+        <tbody>
+          <tr><td><span class="en">SearchCustomerRequest</span></td><td>جستجو با موبایل</td></tr>
+          <tr><td><span class="en">Store/UpdateCustomerRequest</span></td><td>مشتری + اختیاری حساب پورتال</td></tr>
+          <tr><td><span class="en">Store/UpdateDeviceRequest</span></td><td>دستگاه + اعتبارسنجی custom field values</td></tr>
+          <tr><td><span class="en">StoreServiceRequestRequest</span></td><td>ایجاد درخواست خدمت</td></tr>
+          <tr><td><span class="en">AssignTechnicianRequest</span></td><td>ارجاع دستی (+ پرچم suggested)</td></tr>
+          <tr><td><span class="en">ChangeServiceStatusRequest / CloseServiceRequestRequest</span></td><td>تغییر/بستن وضعیت</td></tr>
+          <tr><td><span class="en">FilterAssignmentCalendarRequest</span></td><td>فیلتر تقویم ارجاع</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Technical / Technician / Accountant / Customer</h3>
+      <table>
+        <thead><tr><th>فرم</th><th>هدف</th></tr></thead>
+        <tbody>
+          <tr><td><span class="en">ReceiveDeviceRequest / DeliverDeviceRequest</span></td><td>پذیرش/تحویل کارگاه</td></tr>
+          <tr><td><span class="en">StoreServiceReportRequest</span></td><td>گزارش + قطعات + تصاویر</td></tr>
+          <tr><td><span class="en">RecordManualPaymentRequest</span></td><td>پرداخت نقدی/کارت‌به‌کارت توسط تکنسین</td></tr>
+          <tr><td><span class="en">StoreInvoiceRequest / ConfirmManualPaymentRequest</span></td><td>فاکتور و تأیید حسابدار</td></tr>
+          <tr><td><span class="en">UpdateProfileRequest / StoreFeedbackRequest / Start|VerifyGatewayPaymentRequest</span></td><td>پورتال مشتری</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout info">
+        <strong>الگوی UI فرم‌ها</strong>
+        ویوها معمولاً <code>_form.blade.php</code> مشترک برای create/edit دارند؛ لیبل اجباری با ستاره قرمز؛ اعتبارسنجی موبایل ایرانی روی کارکنان/تکنسین؛ نمایش/پنهان رمز با آیکون چشم.
+      </div>
+    </section>
+
+    <section id="actions">
+      <h2>۹) Actions · Services · Events · Jobs</h2>
+
+      <h3>Actions پیاده‌سازی‌شده</h3>
+      <div class="grid-2">
+        <div class="card">
+          <h4>Customer / Device / Request</h4>
+          <p class="mono">CreateCustomer, UpdateCustomer, CreateDevice, UpdateDevice, CreateServiceRequest, SuggestTechnician, AssignTechnician, ChangeServiceStatus, CloseServiceRequest</p>
+        </div>
+        <div class="card">
+          <h4>Report / Workshop / Finance / Feedback / Auth</h4>
+          <p class="mono">CreateServiceReport, ReceiveDevice, DeliverDevice, CreateInvoice, CreatePayment, StartGatewayPayment, VerifyGatewayPayment, RecordManualPayment, CreateFeedback, Login*, Logout*, Send/VerifyCustomerOtp, LoginCustomerPassword</p>
+        </div>
+      </div>
+
+      <h3>Services</h3>
+      <p class="mono">DocumentNumberService · PaymentService + GatewayInterface (ZarinpalGateway, FakeGateway) · NotificationService · CustomFieldService · TechnicianSuggestionService · InvoiceService · WorkshopService · ReportService</p>
+
+      <h3>Events</h3>
+      <p class="mono">ServiceRequestCreated · ServiceRequestAssigned · ServiceStatusChanged · ServiceRequestClosed · ServiceReportCreated · DeviceReceived · DeviceDelivered · InvoiceCreated · PaymentInitiated · PaymentConfirmed · FeedbackSubmitted</p>
+
+      <h3>Jobs (منبع)</h3>
+      <p class="mono">SendSmsJob · SendEmailJob · SendServiceNotificationJob · VerifyPaymentJob · GenerateDocumentJob</p>
+    </section>
+
+    <section id="auth">
+      <h2>۱۰) احراز هویت و مجوز</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h4>کارکنان داخلی</h4>
+          <p>Guard پیش‌فرض · username/password · هش رمز · rate limit روی ورود</p>
+        </div>
+        <div class="card">
+          <h4>مشتری</h4>
+          <p>Guard جداگانه <code>customer</code> · OTP موبایل (و مسیر password در پیاده‌سازی فعلی) · بدون اجبار رمز در قرارداد OTP منبع</p>
+        </div>
+      </div>
+      <h3>نقش‌ها</h3>
+      <p class="mono">Company Admin/Manager · Operator · Technical Supervisor · Accountant · Technician · Customer</p>
+      <h3>نمونه permissionها</h3>
+      <p class="mono">customers.* · devices.* · requests.view|create|edit|assign|change_status|close · reports.* · invoices.* · payments.view|create|verify · feedback.view</p>
+      <p class="muted">میان‌افزار پنل: <code>EnsurePanelAccess</code> + <code>EnsurePermission</code>.</p>
+    </section>
+
+    <section id="finance">
+      <h2>۱۱) قرارداد مالی</h2>
+      <div class="flow">
+        <span>گزارش قطعات تأییدشده</span><i>←</i>
+        <span>CreateInvoice</span><i>←</i>
+        <span>Payment</span><i>←</i>
+        <span>Gateway Verify / تأیید حسابدار</span>
+      </div>
+      <ul>
+        <li>وضعیت فاکتور: <code>pending_payment</code> · <code>partially_paid</code> · <code>paid</code> · <code>cancelled</code></li>
+        <li>روش پرداخت: <code>gateway</code> · <code>card_transfer</code> · <code>cash</code></li>
+        <li>دستی‌ها با وضعیت <code>pending_confirmation</code> تا تأیید حسابدار</li>
+        <li><code>card_transfer</code> نیازمند تصویر فیش؛ <code>cash</code> اختیاری</li>
+        <li>اسنپ‌شات مشتری و اقلام روی فاکتور (تغییر بعدی مشتری فاکتور قدیم را عوض نکند)</li>
+        <li>کارت/CVV/OTP بانکی ذخیره نمی‌شود؛ callback تکراری نباید پرداخت را دوبار اعمال کند</li>
+      </ul>
+      <h3>شماره‌گذاری</h3>
+      <p>انواع سند: <code>REQUEST (SR)</code> · <code>INVOICE (INV)</code> · <code>RECEPTION (REC)</code> — یکتا روی <code>document_type + year</code>.</p>
+    </section>
+
+    <section id="status">
+      <h2>۱۲) وضعیت خدمت (داده، نه موتور workflow)</h2>
+      <p>وضعیت‌ها در <code>service_statuses</code> و مجاز بودن‌شان برای هر نوع خدمت در <code>service_type_statuses</code> است. تغییر وضعیت تاریخچه می‌نویسد.</p>
+      <div class="grid-2">
+        <div class="card">
+          <h4>نمونه مسیر میدان</h4>
+          <p>New → Waiting for Contact / Assignment → Assigned → Technician Confirmed → On the Way → On Site → Inspecting → Repairing → Repaired → Closed</p>
+        </div>
+        <div class="card">
+          <h4>کارگاه (همان درخواست)</h4>
+          <p>Transfer to Workshop → Device Received → In Workshop → Repairing → Ready for Delivery → Delivered</p>
+        </div>
+      </div>
+      <p class="muted">وضعیت‌های کناری: Cancelled · Customer Absent · Cannot Repair · Revisit Needed · Transfer to Workshop</p>
+    </section>
+
+    <section id="oos">
+      <h2>۱۳) ممنوعیت‌های ساختاری (برای جلوگیری از پیشنهاد اشتباه)</h2>
+      <ul>
+        <li>جدول ۴۲اُم اختراع نشود؛ اسامی ۴۱ جدول ثابت‌اند.</li>
+        <li>بدون <code>work_orders</code>، <code>appointments</code>، <code>checklists</code>، <code>warehouses</code>، <code>stock_*</code>، <code>tenant_id</code>.</li>
+        <li>بدون ENUM مای‌اسکیوال برای status/type.</li>
+        <li>بدون فرض Spatie Permission مگر قرارداد بعدی صریح و منطبق با جداول فعلی roles/permissions.</li>
+        <li>API REST نسخه‌دار هنوز قرارداد منبع ندارد؛ منطق باید روی Action/Service بماند.</li>
+      </ul>
+    </section>
+
+    <section id="review">
+      <h2>۱۴) دستور کار عارضه‌یابی برای Claude</h2>
+      <p>لطفاً این سند را به عنوان تصویر فعلی سیستم در نظر بگیر و روی موارد زیر نظر بده. پیشنهادها باید با اصول بخش ۲ و ممنوعیت‌های بخش ۱۳ سازگار باشند.</p>
+
+      <h3>A. انسجام معماری</h3>
+      <ol>
+        <li>آیا مرز Action/Service/Controller در عمل شفاف است یا نشانه‌ای از نشت منطق به کنترلر/مدل دیده می‌شود؟</li>
+        <li>آیا دامنه Workshop به‌درستی «ادامه Service Request» مانده یا خطر جداشدن زیرسیستم دارد؟</li>
+        <li>مدل Custom Field (دو جدول value جدا، بدون polymorphic) برای مقیاس صنعت‌های مختلف کافی است؟ جایگزین سازگار با منبع چیست؟</li>
+      </ol>
+
+      <h3>B. فرایند و UX عملیاتی</h3>
+      <ol>
+        <li>جریان اپراتور (جستجو مشتری → دستگاه → درخواست → ارجاع) کجا اصطکاک یا گام گم‌شده دارد؟</li>
+        <li>ارجاع «همیشه دستی + پیشنهاد» آیا برای ظرفیت تکنسین/شعبه کافی مدل شده؟</li>
+        <li>تقویم مشتق از assignment چه محدودیت‌هایی برای زمان‌بندی واقعی ایجاد می‌کند؟</li>
+      </ol>
+
+      <h3>C. مالی و امنیت</h3>
+      <ol>
+        <li>مسیر gateway verify + جلوگیری از double-complete را از نظر طراحی Critically بررسی کن.</li>
+        <li>پرداخت دستی pending_confirmation چه ریسک عملیاتی/حسابداری دارد؟</li>
+        <li>اسنپ‌شات فاکتور در برابر تغییر بعدی مشتری/قطعه کامل است؟</li>
+      </ol>
+
+      <h3>D. ساختار کد و مقیاس</h3>
+      <ol>
+        <li>با ۶ پنل و ۴۱ جدول، کجاها احتمال تکرار Form/Controller/View زیاد است و چه abstractionای بدون خروج از معماری کمک می‌کند؟</li>
+        <li>آیا جدا بودن guard مشتری + OTP/password فعلی با قرارداد منبع تنش دارد؟</li>
+        <li>برای نصب‌های مستقل per-company، چه چیزهایی باید در پکیج deploy استاندارد شود (env، PHP extensions مثل iconv، document root جدا از core)؟</li>
+      </ol>
+
+      <h3>E. خروجی مورد انتظار از Claude</h3>
+      <ol>
+        <li>۳ تا ۷ یافتهٔ پرریسک (با شدت: Critical / High / Medium)</li>
+        <li>پیشنهاد بهبود ساختاری کوتاه و اجرایی (نه بازنویسی کامل محصول)</li>
+        <li>لیست چیزهایی که عمداً نباید تغییر کنند (برای حفظ سازگاری با معماری منبع)</li>
+        <li>در صورت تعارض سند/کد، تعارض را صریح گزارش کن؛ حدس نزن</li>
+      </ol>
+
+      <div class="callout warn">
+        <strong>یادداشت وضعیت ریپو</strong>
+        کد فعلی فراتر از اسکلت اولیه است (Actions، پنل‌ها، Form Requests، Events، Services، تست‌ها و استقرار روی <code>app.tv-yar.com</code>). اگر سندی قدیمی‌تر می‌گوید «هنوز پیاده نشده»، این HTML را به‌عنوان تصویر جدیدتر در نظر بگیر.
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      منبع حقیقت معماری: سند اصلی پروژه + <code>docs/ARCHITECTURE.md</code> · <code>docs/DATABASE.md</code> · <code>docs/CONTRACTS.md</code> · قوانین <code>.cursor/rules</code>.
+      این فایل برای اشتراک با Claude جهت عارضه‌یابی ساخته شده است — شامل رمز یا راز پروداکشن نیست.
+    </div>
+  </footer>
+</body>
+</html>

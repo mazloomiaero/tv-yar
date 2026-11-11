@@ -7,6 +7,7 @@ namespace Tests\Feature;
 use App\Models\DeviceType;
 use App\Models\ServiceStatus;
 use App\Models\ServiceType;
+use App\Support\InitialServiceStatus;
 use App\Support\RoleName;
 use App\Support\SampleServiceStatus;
 use Database\Seeders\ServiceStatusSeeder;
@@ -94,6 +95,8 @@ class ServiceCatalogTest extends TestCase
         $status = ServiceStatus::query()->where('name', 'New')->first();
 
         $this->assertNotNull($status);
+        $this->assertNull($status->code);
+        $this->assertFalse($status->is_system);
 
         $this->actingAs($admin)
             ->delete(route('admin.service-statuses.destroy', $status))
@@ -159,9 +162,50 @@ class ServiceCatalogTest extends TestCase
         $names = ServiceStatus::query()->orderBy('id')->pluck('name')->all();
 
         $this->assertSame(SampleServiceStatus::names(), $names);
+        $this->assertSame(
+            SampleServiceStatus::codes(),
+            ServiceStatus::query()->orderBy('id')->pluck('code')->all(),
+        );
+        $this->assertSame(
+            count(SampleServiceStatus::codes()),
+            ServiceStatus::query()->where('is_system', true)->count(),
+        );
         $this->assertContains('دستگاه دریافت شد', $names);
         $this->assertContains('در کارگاه', $names);
         $this->assertContains('آماده تحویل', $names);
         $this->assertContains('تحویل شده', $names);
+    }
+
+    public function test_seeder_attaches_stable_codes_to_legacy_english_names(): void
+    {
+        ServiceStatus::factory()->create([
+            'name' => 'New',
+            'code' => null,
+            'is_system' => false,
+        ]);
+
+        $this->seed(ServiceStatusSeeder::class);
+
+        $status = ServiceStatus::query()->where('code', InitialServiceStatus::CODE)->first();
+
+        $this->assertNotNull($status);
+        $this->assertSame(InitialServiceStatus::NAME, $status->name);
+        $this->assertTrue($status->is_system);
+        $this->assertSame(count(SampleServiceStatus::definitions()), ServiceStatus::query()->count());
+    }
+
+    public function test_seeder_does_not_reset_a_renamed_system_status_label(): void
+    {
+        $status = ServiceStatus::factory()->create([
+            'name' => 'ورودی جدید',
+            'code' => InitialServiceStatus::CODE,
+            'is_system' => true,
+        ]);
+
+        $this->seed(ServiceStatusSeeder::class);
+
+        $this->assertSame('ورودی جدید', $status->fresh()->name);
+        $this->assertTrue($status->fresh()->is_system);
+        $this->assertSame(count(SampleServiceStatus::definitions()), ServiceStatus::query()->count());
     }
 }

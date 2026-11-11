@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Exceptions\CatalogDeletionException;
 use Database\Factories\DeviceTypeFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,6 +18,18 @@ class DeviceType extends Model
 {
     /** @use HasFactory<DeviceTypeFactory> */
     use HasFactory, SoftDeletes;
+
+    protected static function booted(): void
+    {
+        static::deleting(function (DeviceType $deviceType): void {
+            // Soft delete does not trip RESTRICT foreign keys.
+            $count = $deviceType->devices()->withTrashed()->count();
+
+            if ($count > 0) {
+                throw CatalogDeletionException::referenced('device type', $count);
+            }
+        });
+    }
 
     /**
      * @return HasMany<Device, $this>

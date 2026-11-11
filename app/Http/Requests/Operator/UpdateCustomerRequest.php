@@ -37,7 +37,13 @@ class UpdateCustomerRequest extends FormRequest
             ],
             'first_name' => ['required', 'string', 'max:100'],
             'last_name' => ['required', 'string', 'max:100'],
-            'mobile' => ['required', 'string', 'max:30'],
+            'mobile' => [
+                'required',
+                'string',
+                'size:11',
+                'regex:/^09\d{9}$/',
+                Rule::unique('customers', 'mobile')->ignore($customer->id)->whereNull('deleted_at'),
+            ],
             'mobile_secondary' => ['nullable', 'string', 'max:30'],
             'email' => ['nullable', 'string', 'max:150'],
             'national_id' => ['nullable', 'string', 'max:20'],
@@ -57,6 +63,17 @@ class UpdateCustomerRequest extends FormRequest
                 'confirmed',
                 Rule::requiredIf(fn (): bool => $customer->user_id === null && $this->filled('portal_username')),
             ],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'mobile.size' => 'تلفن همراه باید دقیقاً ۱۱ رقم باشد.',
+            'mobile.regex' => 'تلفن همراه باید عدد باشد و با ۰۹ شروع شود.',
         ];
     }
 }

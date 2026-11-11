@@ -63,13 +63,14 @@ return [
     | Application Timezone
     |--------------------------------------------------------------------------
     |
-    | Here you may specify the default timezone for your application, which
-    | will be used by the PHP date and date-time functions. The timezone
-    | is set to "UTC" by default as it is suitable for most use cases.
+    | Default timezone for PHP date functions and Eloquent datetimes.
+    | Stored datetimes are naive wall-clock values in this timezone;
+    | do not apply a second offset when displaying them. Date-only
+    | columns stay calendar dates and are not shifted.
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => env('APP_TIMEZONE', 'Asia/Tehran'),
 
     /*
     |--------------------------------------------------------------------------

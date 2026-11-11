@@ -33,18 +33,13 @@ class CustomerTest extends TestCase
             ->assertSee(route('admin.customers.create'), false);
     }
 
-    public function test_operator_can_search_customers_by_mobile_including_duplicates(): void
+    public function test_operator_can_search_customers_by_mobile(): void
     {
         $operator = $this->staffUser(RoleName::Operator);
 
         Customer::factory()->create([
             'customer_code' => 'C-001',
             'first_name' => 'Ada',
-            'mobile' => '09120000001',
-        ]);
-        Customer::factory()->create([
-            'customer_code' => 'C-002',
-            'first_name' => 'Grace',
             'mobile' => '09120000001',
         ]);
         Customer::factory()->create([
@@ -57,8 +52,6 @@ class CustomerTest extends TestCase
             ->assertOk()
             ->assertSee('C-001')
             ->assertSee('Ada')
-            ->assertSee('C-002')
-            ->assertSee('Grace')
             ->assertDontSee('C-003');
     }
 
@@ -144,7 +137,7 @@ class CustomerTest extends TestCase
         $this->assertSame('cust1', $customer->user?->username);
     }
 
-    public function test_mobile_is_not_unique_on_create(): void
+    public function test_duplicate_mobile_is_rejected_on_create(): void
     {
         $operator = $this->staffUser(RoleName::Operator);
 
@@ -154,12 +147,76 @@ class CustomerTest extends TestCase
         ]);
 
         $this->actingAs($operator)
+            ->from(route('operator.customers.create'))
+            ->post(route('operator.customers.store'), $this->customerPayload([
+                'customer_code' => 'CUS-201',
+            ]))
+            ->assertRedirect(route('operator.customers.create'))
+            ->assertSessionHasErrors('mobile');
+
+        $this->assertSame(1, Customer::query()->where('mobile', '09121112233')->count());
+    }
+
+    public function test_invalid_mobile_format_is_rejected_on_create(): void
+    {
+        $operator = $this->staffUser(RoleName::Operator);
+
+        $this->actingAs($operator)
+            ->from(route('operator.customers.create'))
+            ->post(route('operator.customers.store'), $this->customerPayload([
+                'mobile' => '12345678901',
+            ]))
+            ->assertRedirect(route('operator.customers.create'))
+            ->assertSessionHasErrors('mobile');
+
+        $this->assertNull(Customer::query()->where('customer_code', 'CUS-100')->first());
+    }
+
+    public function test_mobile_of_a_soft_deleted_customer_can_be_reused(): void
+    {
+        $operator = $this->staffUser(RoleName::Operator);
+
+        $deleted = Customer::factory()->create([
+            'customer_code' => 'CUS-200',
+            'mobile' => '09121112233',
+        ]);
+        $deleted->delete();
+
+        $this->actingAs($operator)
             ->post(route('operator.customers.store'), $this->customerPayload([
                 'customer_code' => 'CUS-201',
             ]))
             ->assertRedirect();
 
-        $this->assertSame(2, Customer::query()->where('mobile', '09121112233')->count());
+        $this->assertSame(1, Customer::query()->where('mobile', '09121112233')->count());
+        $this->assertNotNull(Customer::query()->where('customer_code', 'CUS-201')->first());
+    }
+
+    public function test_duplicate_mobile_is_rejected_on_update(): void
+    {
+        $operator = $this->staffUser(RoleName::Operator);
+
+        Customer::factory()->create([
+            'customer_code' => 'CUS-400',
+            'mobile' => '09124445566',
+        ]);
+        $customer = Customer::factory()->create([
+            'customer_code' => 'CUS-401',
+            'mobile' => '09120000002',
+        ]);
+
+        $this->actingAs($operator)
+            ->from(route('operator.customers.edit', $customer))
+            ->put(route('operator.customers.update', $customer), $this->customerPayload([
+                'customer_code' => 'CUS-401',
+                'mobile' => '09124445566',
+            ]))
+            ->assertRedirect(route('operator.customers.edit', $customer))
+            ->assertSessionHasErrors('mobile');
+
+        $customer->refresh();
+
+        $this->assertSame('09120000002', $customer->mobile);
     }
 
     public function test_duplicate_customer_code_is_rejected(): void

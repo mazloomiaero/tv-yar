@@ -1,16 +1,17 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('content')
-    <x-page-header title="ثبت مهارت" />
+    <x-page-header title="ثبت مهارت" subtitle="مهارت جدید برای پیشنهاد ارجاع." />
 
-    <x-card>
-        <form method="POST" action="{{ route('admin.skills.store') }}" class="space-y-4">
-            @csrf
+    <form method="POST" action="{{ route('admin.skills.store') }}">
+        @csrf
+        <x-form-shell kicker="تکنسین" title="ثبت مهارت" subtitle="مهارت جدید برای پیشنهاد ارجاع.">
             @include('admin.skills._form', ['skill' => null])
-            <div class="flex gap-2">
+
+            <x-slot:actions>
                 <x-button>ثبت</x-button>
                 <x-button variant="secondary" href="{{ route('admin.skills.index') }}">بازگشت</x-button>
-            </div>
-        </form>
-    </x-card>
+            </x-slot:actions>
+        </x-form-shell>
+    </form>
 @endsection

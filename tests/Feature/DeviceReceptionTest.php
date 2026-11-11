@@ -235,11 +235,26 @@ class DeviceReceptionTest extends TestCase
      */
     private function workshopContext(): array
     {
-        $new = ServiceStatus::factory()->create(['name' => InitialServiceStatus::NAME]);
-        $received = ServiceStatus::factory()->create(['name' => WorkshopServiceStatus::DeviceReceived]);
-        $inWorkshop = ServiceStatus::factory()->create(['name' => WorkshopServiceStatus::InWorkshop]);
-        $ready = ServiceStatus::factory()->create(['name' => WorkshopServiceStatus::ReadyForDelivery]);
-        $delivered = ServiceStatus::factory()->create(['name' => WorkshopServiceStatus::Delivered]);
+        $new = ServiceStatus::factory()->create([
+            'name' => InitialServiceStatus::NAME,
+            'code' => InitialServiceStatus::CODE,
+        ]);
+        $received = ServiceStatus::factory()->create([
+            'name' => WorkshopServiceStatus::DeviceReceived,
+            'code' => WorkshopServiceStatus::DeviceReceivedCode,
+        ]);
+        $inWorkshop = ServiceStatus::factory()->create([
+            'name' => WorkshopServiceStatus::InWorkshop,
+            'code' => WorkshopServiceStatus::InWorkshopCode,
+        ]);
+        $ready = ServiceStatus::factory()->create([
+            'name' => WorkshopServiceStatus::ReadyForDelivery,
+            'code' => WorkshopServiceStatus::ReadyForDeliveryCode,
+        ]);
+        $delivered = ServiceStatus::factory()->create([
+            'name' => WorkshopServiceStatus::Delivered,
+            'code' => WorkshopServiceStatus::DeliveredCode,
+        ]);
 
         $deviceType = DeviceType::factory()->create();
         $serviceType = ServiceType::factory()->create();
