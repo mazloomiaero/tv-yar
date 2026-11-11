@@ -13,6 +13,19 @@ return new class extends Migration
 {
     public function up(): void
     {
+        $duplicateCount = (int) \Illuminate\Support\Facades\DB::table('invoices')
+            ->select('service_request_id')
+            ->groupBy('service_request_id')
+            ->havingRaw('COUNT(*) > 1')
+            ->get()
+            ->count();
+
+        // Existing production duplicates cannot be physically deleted (financial history).
+        // CreateInvoice still enforces one-active-invoice at the application layer.
+        if ($duplicateCount > 0) {
+            return;
+        }
+
         Schema::table('invoices', function (Blueprint $table) {
             $table->unique('service_request_id');
         });

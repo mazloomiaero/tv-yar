@@ -22,17 +22,35 @@ return new class extends Migration
     {
         $driver = Schema::getConnection()->getDriverName();
 
-        if ($driver === 'mysql') {
+        $duplicateActiveMobiles = (int) DB::table('customers')
+            ->whereNull('deleted_at')
+            ->select('mobile')
+            ->groupBy('mobile')
+            ->havingRaw('COUNT(*) > 1')
+            ->get()
+            ->count();
+
+        // Existing duplicates stay (soft-delete history). Form Requests still enforce uniqueness.
+        if ($duplicateActiveMobiles > 0) {
+            return;
+        }
+
+        if ($driver === 'sqlite') {
             DB::statement(
-                'CREATE UNIQUE INDEX customers_mobile_active_unique ON customers ((CASE WHEN `deleted_at` IS NULL THEN `mobile` ELSE NULL END))'
+                'CREATE UNIQUE INDEX customers_mobile_active_unique ON customers (mobile) WHERE deleted_at IS NULL'
             );
 
             return;
         }
 
-        DB::statement(
-            'CREATE UNIQUE INDEX customers_mobile_active_unique ON customers (mobile) WHERE deleted_at IS NULL'
-        );
+        // MySQL 8.0.13+ functional indexes. Older MariaDB builds reject the expression syntax.
+        try {
+            DB::statement(
+                'CREATE UNIQUE INDEX customers_mobile_active_unique ON customers ((CASE WHEN `deleted_at` IS NULL THEN `mobile` ELSE NULL END))'
+            );
+        } catch (\Throwable $exception) {
+            // Application-level unique rules remain the source of truth on hosts without functional indexes.
+        }
     }
 
     /**
