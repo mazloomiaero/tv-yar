@@ -1,0 +1,353 @@
+@import url('https://fonts.bunny.net/css?family=vazirmatn:400,500,600,700');
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../views/**/*.blade.php';
+
+@theme {
+    --font-sans: 'Vazirmatn', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+    --color-brand: #0f766e;
+    --color-brand-secondary: #334155;
+}
+
+@layer base {
+    html {
+        @apply scroll-smooth;
+    }
+
+    body {
+        @apply bg-slate-50 text-slate-800 antialiased;
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--color-brand);
+        outline-offset: 2px;
+    }
+}
+
+@layer components {
+    .ui-page-title {
+        @apply text-xl font-semibold text-slate-900 sm:text-2xl;
+    }
+
+    .ui-page-subtitle {
+        @apply mt-1 text-sm text-slate-500;
+    }
+
+    .ui-card {
+        @apply rounded-xl border border-slate-200 bg-white p-5 shadow-sm;
+    }
+
+    .ui-label {
+        @apply mb-1.5 block text-sm font-medium text-slate-700;
+    }
+
+    .ui-input,
+    .ui-select,
+    .ui-textarea {
+        @apply block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition;
+        @apply placeholder:text-slate-400;
+        @apply focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20 focus:outline-none;
+    }
+
+    .ui-textarea {
+        @apply min-h-24;
+    }
+
+    .ui-checkbox {
+        @apply size-4 rounded border-slate-300 text-teal-700 focus:ring-teal-600;
+    }
+
+    .ui-fieldset {
+        @apply space-y-3 rounded-xl border border-slate-200 bg-slate-50/70 p-4;
+    }
+
+    .ui-legend {
+        @apply px-1 text-sm font-semibold text-slate-800;
+    }
+
+    .ui-btn-primary,
+    .ui-btn-secondary,
+    .ui-btn-danger,
+    .ui-btn-ghost {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition;
+        @apply focus-visible:outline-2 focus-visible:outline-offset-2;
+        @apply disabled:cursor-not-allowed disabled:opacity-50;
+    }
+
+    .ui-btn-primary {
+        @apply text-white hover:brightness-95;
+        background-color: var(--color-brand);
+    }
+
+    .ui-btn-secondary {
+        @apply border border-slate-300 bg-white text-slate-700 hover:bg-slate-50;
+    }
+
+    .ui-btn-danger {
+        @apply border border-red-200 bg-red-50 text-red-700 hover:bg-red-100;
+    }
+
+    .ui-btn-ghost {
+        @apply text-slate-600 hover:bg-slate-100;
+    }
+
+    .ui-alert-success,
+    .ui-alert-danger {
+        @apply rounded-lg border px-4 py-3 text-sm;
+    }
+
+    .ui-alert-success {
+        @apply border-emerald-200 bg-emerald-50 text-emerald-800;
+    }
+
+    .ui-alert-danger {
+        @apply border-red-200 bg-red-50 text-red-800;
+    }
+
+    .ui-table-wrap {
+        @apply overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm;
+    }
+
+    .ui-table {
+        @apply min-w-full divide-y divide-slate-200 text-sm;
+    }
+
+    .ui-table thead {
+        @apply bg-slate-50 text-right text-xs font-semibold tracking-wide text-slate-500 uppercase;
+    }
+
+    .ui-table th,
+    .ui-table td {
+        @apply px-4 py-3 whitespace-nowrap;
+    }
+
+    .ui-table tbody tr {
+        @apply border-t border-slate-100 hover:bg-slate-50/80;
+    }
+
+    .ui-empty {
+        @apply rounded-xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center text-sm text-slate-500;
+    }
+
+    .ui-stat {
+        @apply rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition;
+        @apply hover:border-teal-200 hover:shadow-md;
+    }
+
+    .ui-stat-accent {
+        border-inline-start-width: 4px;
+        border-inline-start-color: var(--color-brand);
+    }
+
+    .ui-stat-label {
+        @apply text-sm text-slate-500;
+    }
+
+    .ui-stat-value {
+        @apply mt-2 text-2xl font-semibold tracking-tight text-slate-900;
+    }
+
+    .ui-stat-key {
+        @apply mt-1 font-mono text-xs text-slate-400;
+    }
+
+    .ui-section-title {
+        @apply mb-4 text-sm font-semibold text-slate-800;
+    }
+
+    .ui-start-step {
+        @apply flex gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition;
+        @apply hover:border-teal-200 hover:shadow-md;
+    }
+
+    .ui-start-step-index {
+        @apply flex size-8 shrink-0 items-center justify-center rounded-lg text-sm font-semibold text-white;
+        background-color: var(--color-brand);
+    }
+
+    .ui-badge {
+        @apply inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700;
+    }
+
+    .ui-link {
+        @apply text-sm font-medium text-teal-800 hover:text-teal-950 hover:underline;
+    }
+
+    .ui-password {
+        @apply relative;
+    }
+
+    .ui-password .ui-input {
+        @apply pe-11;
+    }
+
+    .ui-password-toggle {
+        @apply absolute inset-y-0 end-0 flex cursor-pointer items-center px-3 text-slate-500 transition hover:text-slate-800;
+    }
+
+    .auth-shell {
+        background:
+            radial-gradient(1200px 600px at 100% 0%, color-mix(in srgb, var(--color-brand) 14%, transparent), transparent 55%),
+            radial-gradient(900px 500px at 0% 100%, color-mix(in srgb, #0369a1 10%, transparent), transparent 50%),
+            #f8fafc;
+    }
+
+    .auth-skip {
+        @apply sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:shadow-lg;
+    }
+
+    .auth-grid {
+        @apply grid min-h-screen lg:grid-cols-2;
+    }
+
+    .auth-brand {
+        @apply relative hidden overflow-hidden text-white lg:flex;
+        background:
+            linear-gradient(160deg, #020617 0%, #0f172a 48%, color-mix(in srgb, var(--color-brand) 55%, #0f172a) 100%);
+    }
+
+    .auth-brand-glow {
+        @apply pointer-events-none absolute -start-24 top-16 h-72 w-72 rounded-full opacity-40 blur-3xl;
+        background: color-mix(in srgb, var(--color-brand) 70%, transparent);
+    }
+
+    .auth-brand-grid {
+        @apply pointer-events-none absolute inset-0 opacity-[0.12];
+        background-image:
+            linear-gradient(to left, rgba(255, 255, 255, 0.35) 1px, transparent 1px),
+            linear-gradient(to top, rgba(255, 255, 255, 0.35) 1px, transparent 1px);
+        background-size: 44px 44px;
+        mask-image: linear-gradient(180deg, black, transparent 90%);
+    }
+
+    .auth-brand-inner {
+        @apply relative z-10 flex w-full max-w-xl flex-col justify-center px-10 py-14 xl:px-16;
+    }
+
+    .auth-brand-mark {
+        @apply mb-8;
+    }
+
+    .auth-logo-fallback {
+        @apply flex h-14 w-14 items-center justify-center rounded-2xl text-xl font-bold text-white ring-1 ring-white/20;
+        background: color-mix(in srgb, var(--color-brand) 88%, white);
+    }
+
+    .auth-kicker {
+        @apply mb-3 text-xs font-semibold tracking-[0.18em] text-slate-300 uppercase;
+    }
+
+    .auth-brand-title {
+        @apply text-3xl font-bold leading-tight tracking-tight text-white xl:text-4xl;
+        animation: auth-rise 560ms ease-out both;
+    }
+
+    .auth-brand-company {
+        @apply mt-3 text-sm text-slate-300;
+    }
+
+    .auth-brand-lead {
+        @apply mt-5 max-w-md text-base leading-7 text-slate-300;
+        animation: auth-rise 560ms ease-out 80ms both;
+    }
+
+    .auth-trust-list {
+        @apply mt-10 space-y-3;
+        animation: auth-rise 560ms ease-out 140ms both;
+    }
+
+    .auth-trust-list li {
+        @apply flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200 backdrop-blur-sm;
+    }
+
+    .auth-trust-list svg {
+        @apply size-5 shrink-0 text-teal-200;
+    }
+
+    .auth-panel {
+        @apply flex min-h-screen flex-col items-center justify-center px-4 py-10 sm:px-8;
+    }
+
+    .auth-panel-card {
+        @apply w-full max-w-md rounded-2xl border border-slate-200/90 bg-white p-6 shadow-[0_20px_50px_-28px_rgba(15,23,42,0.35)] sm:p-8;
+    }
+
+    .auth-enter {
+        animation: auth-rise 520ms ease-out both;
+    }
+
+    .auth-form-header {
+        @apply mb-6;
+    }
+
+    .auth-form-badge {
+        @apply mb-4 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600;
+    }
+
+    .auth-form-badge svg {
+        @apply size-3.5 text-slate-500;
+    }
+
+    .auth-form-title {
+        @apply text-2xl font-bold tracking-tight text-slate-900;
+    }
+
+    .auth-form-subtitle {
+        @apply mt-2 text-sm leading-6 text-slate-500;
+    }
+
+    .auth-form {
+        @apply space-y-5;
+    }
+
+    .auth-submit {
+        @apply mt-1 min-h-11 cursor-pointer;
+    }
+
+    .auth-footer {
+        @apply mt-6 text-center;
+    }
+
+    @keyframes auth-rise {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .auth-brand-title,
+        .auth-brand-lead,
+        .auth-trust-list,
+        .auth-enter {
+            animation: none;
+        }
+    }
+
+    .ui-dl {
+        @apply grid gap-3 sm:grid-cols-2;
+    }
+
+    .ui-dl dt {
+        @apply text-xs font-medium text-slate-500;
+    }
+
+    .ui-dl dd {
+        @apply mt-0.5 text-sm text-slate-900;
+    }
+
+    .ui-nav-link {
+        @apply flex items-center rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white;
+    }
+
+    .ui-nav-link-active {
+        @apply bg-white/15 text-white;
+    }
+}
