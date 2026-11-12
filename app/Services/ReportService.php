@@ -20,6 +20,7 @@ use App\Support\PaymentMethod;
 use App\Support\PaymentStatus;
 use App\Support\ServiceRequestSource;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -111,6 +112,133 @@ class ReportService
     public function paymentCountsByMethod(): array
     {
         return $this->groupedCounts('payments', 'method', PaymentMethod::values());
+    }
+
+    /**
+     * Service request counts grouped by current status name.
+     *
+     * @return array<string, int>
+     */
+    public function requestCountsByStatusName(): array
+    {
+        $found = ServiceRequest::query()
+            ->select('service_statuses.name as status_name', DB::raw('COUNT(*) as aggregate'))
+            ->leftJoin('service_statuses', 'service_statuses.id', '=', 'service_requests.status_id')
+            ->groupBy('service_statuses.name')
+            ->pluck('aggregate', 'status_name')
+            ->all();
+
+        $counts = [];
+        foreach ($found as $name => $aggregate) {
+            $label = filled($name) ? (string) $name : 'بدون وضعیت';
+            $counts[$label] = (int) $aggregate;
+        }
+
+        return $counts;
+    }
+
+    /**
+     * Daily service_request creations for the last N calendar days (inclusive of today).
+     *
+     * @return list<array{date: string, label: string, count: int}>
+     */
+    public function requestDailyCounts(int $days = 30): array
+    {
+        $days = max(1, min(90, $days));
+        $end = Carbon::today();
+        $start = $end->copy()->subDays($days - 1);
+
+        $found = ServiceRequest::query()
+            ->select(DB::raw('DATE(created_at) as day'), DB::raw('COUNT(*) as aggregate'))
+            ->whereDate('created_at', '>=', $start->toDateString())
+            ->whereDate('created_at', '<=', $end->toDateString())
+            ->groupBy('day')
+            ->pluck('aggregate', 'day')
+            ->all();
+
+        $series = [];
+        for ($cursor = $start->copy(); $cursor->lte($end); $cursor->addDay()) {
+            $key = $cursor->toDateString();
+            $series[] = [
+                'date' => $key,
+                'label' => $cursor->format('m/d'),
+                'count' => (int) ($found[$key] ?? 0),
+            ];
+        }
+
+        return $series;
+    }
+
+    /**
+     * Latest feedback rows for dashboard display.
+     *
+     * @return Collection<int, Feedback>
+     */
+    public function recentFeedbacks(int $limit = 5): Collection
+    {
+        return Feedback::query()
+            ->with('serviceRequest')
+            ->orderByDesc('id')
+            ->limit(max(1, min(20, $limit)))
+            ->get();
+    }
+
+    /**
+     * Lightweight recent operational events for the admin dashboard feed.
+     *
+     * @return list<array{time: string, title: string, detail: string}>
+     */
+    public function recentDashboardEvents(int $limit = 6): array
+    {
+        $limit = max(1, min(20, $limit));
+        $events = [];
+
+        foreach (Payment::query()->orderByDesc('id')->limit($limit)->get() as $payment) {
+            $events[] = [
+                'sort' => $payment->id,
+                'time' => optional($payment->created_at)->format('H:i') ?? '—',
+                'title' => 'پرداخت '.$payment->reference_number,
+                'detail' => $payment->method.' · '.$payment->status,
+            ];
+        }
+
+        foreach (ServiceAssignment::query()->with('serviceRequest')->orderByDesc('id')->limit($limit)->get() as $assignment) {
+            $events[] = [
+                'sort' => $assignment->id,
+                'time' => optional($assignment->created_at)->format('H:i') ?? '—',
+                'title' => 'ارجاع تکنسین '.($assignment->serviceRequest?->request_number ?? ''),
+                'detail' => $assignment->is_suggested ? 'از لیست پیشنهاد' : 'انتخاب دستی',
+            ];
+        }
+
+        foreach (ServiceReport::query()->with('serviceRequest')->orderByDesc('id')->limit($limit)->get() as $report) {
+            $events[] = [
+                'sort' => $report->id,
+                'time' => optional($report->created_at)->format('H:i') ?? '—',
+                'title' => 'گزارش خدمت '.($report->serviceRequest?->request_number ?? ''),
+                'detail' => 'ثبت گزارش فنی',
+            ];
+        }
+
+        foreach (DeviceReception::query()->orderByDesc('id')->limit($limit)->get() as $reception) {
+            $events[] = [
+                'sort' => $reception->id,
+                'time' => optional($reception->created_at)->format('H:i') ?? '—',
+                'title' => 'پذیرش کارگاهی '.$reception->receipt_number,
+                'detail' => 'رسید پذیرش ثبت شد',
+            ];
+        }
+
+        usort($events, static fn (array $a, array $b): int => $b['sort'] <=> $a['sort']);
+
+        return array_map(
+            static fn (array $event): array => [
+                'time' => $event['time'],
+                'title' => trim($event['title']),
+                'detail' => $event['detail'],
+            ],
+            array_slice($events, 0, $limit),
+        );
     }
 
     /**

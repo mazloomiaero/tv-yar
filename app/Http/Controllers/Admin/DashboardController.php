@@ -19,6 +19,10 @@ class DashboardController extends Controller
             'assignmentSuggestionCounts' => $reports->assignmentSuggestionCounts(),
             'invoiceCountsByStatus' => $reports->invoiceCountsByStatus(),
             'paymentCountsByMethod' => $reports->paymentCountsByMethod(),
+            'requestCountsByStatus' => $reports->requestCountsByStatusName(),
+            'requestDailyCounts' => $reports->requestDailyCounts(30),
+            'recentFeedbacks' => $reports->recentFeedbacks(5),
+            'recentEvents' => $reports->recentDashboardEvents(6),
         ]);
     }
 }

@@ -17,12 +17,12 @@
 
     <x-dashboard.section title="شاخص‌های فنی">
         <div class="dash-metric-grid dash-metric-grid--3">
-            <x-dashboard.metric label="درخواست‌ها" :value="$requestCount" tone="brand" />
-            <x-dashboard.metric label="ارجاع‌ها" :value="$assignmentCount" tone="soft" />
-            <x-dashboard.metric label="پذیرش کارگاه" :value="$receptionCount" tone="ok" />
-            <x-dashboard.metric label="گزارش‌ها" :value="$reportCount" tone="brand" />
-            <x-dashboard.metric label="ارجاع از پیشنهاد" :value="$assignmentSuggestionCounts['suggested']" tone="ok" />
-            <x-dashboard.metric label="ارجاع دستی" :value="$assignmentSuggestionCounts['not_suggested']" tone="soft" />
+            <x-dashboard.metric label="درخواست‌ها" :value="$requestCount" tone="brand" icon="blue" :progress="65" />
+            <x-dashboard.metric label="ارجاع‌ها" :value="$assignmentCount" tone="soft" icon="orange" :progress="50" bar="orange" />
+            <x-dashboard.metric label="پذیرش کارگاه" :value="$receptionCount" tone="ok" icon="green" :progress="45" bar="green" />
+            <x-dashboard.metric label="گزارش‌ها" :value="$reportCount" tone="brand" icon="blue" :progress="55" />
+            <x-dashboard.metric label="ارجاع از پیشنهاد" :value="$assignmentSuggestionCounts['suggested']" tone="ok" icon="green" :progress="40" bar="green" />
+            <x-dashboard.metric label="ارجاع دستی" :value="$assignmentSuggestionCounts['not_suggested']" tone="soft" icon="purple" :progress="35" bar="purple" />
         </div>
     </x-dashboard.section>
 

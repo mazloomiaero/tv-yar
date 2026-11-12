@@ -22,11 +22,11 @@
 
     <x-dashboard.section title="شمارش‌های عملیاتی">
         <div class="dash-metric-grid dash-metric-grid--5">
-            <x-dashboard.metric label="مشتریان" :value="$customerCount" tone="brand" />
-            <x-dashboard.metric label="دستگاه‌ها" :value="$deviceCount" tone="soft" />
-            <x-dashboard.metric label="درخواست‌ها" :value="$requestCount" tone="brand" />
-            <x-dashboard.metric label="ارجاع‌ها" :value="$assignmentCount" tone="ok" />
-            <x-dashboard.metric label="بازخوردها" :value="$feedbackCount" tone="soft" />
+            <x-dashboard.metric label="مشتریان" :value="$customerCount" tone="brand" icon="blue" :progress="60" />
+            <x-dashboard.metric label="دستگاه‌ها" :value="$deviceCount" tone="soft" icon="orange" :progress="48" bar="orange" />
+            <x-dashboard.metric label="درخواست‌ها" :value="$requestCount" tone="brand" icon="blue" :progress="70" />
+            <x-dashboard.metric label="ارجاع‌ها" :value="$assignmentCount" tone="ok" icon="green" :progress="55" bar="green" />
+            <x-dashboard.metric label="بازخوردها" :value="$feedbackCount" tone="soft" icon="purple" :progress="40" bar="purple" />
         </div>
     </x-dashboard.section>
 

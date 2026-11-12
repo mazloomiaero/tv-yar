@@ -5,8 +5,8 @@
     }
     $productName = 'سامانه مدیریت خدمات فنی';
     $brandName = filled($brandCompany?->name) ? $brandCompany->name : $productName;
-    $primary = filled($brandCompany?->primary_color) ? $brandCompany->primary_color : '#0f766e';
-    $secondary = filled($brandCompany?->secondary_color) ? $brandCompany->secondary_color : '#0f172a';
+    $primary = filled($brandCompany?->primary_color) ? $brandCompany->primary_color : '#2563eb';
+    $secondary = filled($brandCompany?->secondary_color) ? $brandCompany->secondary_color : '#0b1b3a';
     $logo = $brandCompany?->logo;
 @endphp
 <!DOCTYPE html>

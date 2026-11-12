@@ -13,8 +13,8 @@
 
     <x-dashboard.section title="خلاصه ارجاع">
         <div class="dash-metric-grid">
-            <x-dashboard.metric label="ارجاع‌ها" :value="$assignmentCount" tone="brand" />
-            <x-dashboard.metric label="از فهرست پیشنهاد" :value="$suggestedCount" tone="ok" />
+            <x-dashboard.metric label="ارجاع‌ها" :value="$assignmentCount" tone="brand" icon="orange" :progress="60" bar="orange" />
+            <x-dashboard.metric label="از فهرست پیشنهاد" :value="$suggestedCount" tone="ok" icon="green" :progress="45" bar="green" />
         </div>
     </x-dashboard.section>
 

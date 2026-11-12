@@ -103,4 +103,15 @@ class ReportServiceTest extends TestCase
         $this->assertArrayNotHasKey('work_orders', $counts);
         $this->assertArrayNotHasKey('tenant_id', $counts);
     }
+
+    public function test_request_daily_counts_fills_calendar_days(): void
+    {
+        ServiceRequest::factory()->create();
+
+        $series = (new ReportService)->requestDailyCounts(7);
+
+        $this->assertCount(7, $series);
+        $this->assertSame(now()->toDateString(), $series[6]['date']);
+        $this->assertGreaterThanOrEqual(1, array_sum(array_column($series, 'count')));
+    }
 }

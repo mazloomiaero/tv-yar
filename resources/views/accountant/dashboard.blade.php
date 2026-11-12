@@ -36,6 +36,9 @@
                     :label="$invoiceLabels[$status] ?? $status"
                     :value="$count"
                     :tone="$status === 'paid' ? 'ok' : ($status === 'cancelled' ? 'warn' : 'brand')"
+                    :icon="$status === 'paid' ? 'green' : ($status === 'cancelled' ? 'orange' : 'blue')"
+                    :progress="min(100, 20 + ((int) $count) * 8)"
+                    :bar="$status === 'paid' ? 'green' : ($status === 'cancelled' ? 'orange' : 'blue')"
                 />
             @empty
                 <p class="text-sm text-slate-500">فاکتوری ثبت نشده است.</p>
