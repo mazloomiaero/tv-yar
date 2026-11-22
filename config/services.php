@@ -44,4 +44,14 @@ return [
         'sandbox' => env('ZARINPAL_SANDBOX', true),
     ],
 
+    'farazsms' => [
+        'base_url' => env('FARAZSMS_BASE_URL', 'https://api.iranpayamak.com'),
+        'api_key' => env('FARAZSMS_API_KEY'),
+        'pattern_code' => env('FARAZSMS_PATTERN_CODE'),
+        'otp_param' => env('FARAZSMS_OTP_PARAM', 'code'),
+        'line_number' => env('FARAZSMS_LINE_NUMBER', '90008361'),
+        // Local Windows PHP often needs an explicit CA bundle for Guzzle/cURL.
+        'ca_bundle' => env('FARAZSMS_CA_BUNDLE', ini_get('curl.cainfo') ?: ini_get('openssl.cafile') ?: ''),
+    ],
+
 ];

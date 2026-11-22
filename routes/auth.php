@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\CustomerOtpLoginController;
 use App\Http\Controllers\Auth\CustomerPasswordLoginController;
 use App\Http\Controllers\Auth\InternalLoginController;
 use App\Http\Controllers\Auth\InternalLogoutController;
+use App\Http\Controllers\Auth\InternalOtpLoginController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest:web')->group(function (): void {
@@ -14,6 +15,14 @@ Route::middleware('guest:web')->group(function (): void {
     Route::post('/login', [InternalLoginController::class, 'store'])
         ->middleware('throttle:internal-login')
         ->name('login.store');
+    Route::get('/login/otp', [InternalOtpLoginController::class, 'create'])->name('login.otp.form');
+    Route::post('/login/otp', [InternalOtpLoginController::class, 'send'])
+        ->middleware('throttle:internal-otp')
+        ->name('login.otp');
+    Route::get('/login/verify', [InternalOtpLoginController::class, 'showVerify'])->name('login.verify');
+    Route::post('/login/verify', [InternalOtpLoginController::class, 'verify'])
+        ->middleware('throttle:internal-otp')
+        ->name('login.verify.store');
 });
 
 Route::post('/logout', InternalLogoutController::class)

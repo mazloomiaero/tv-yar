@@ -415,6 +415,18 @@
         @apply space-y-5;
     }
 
+    .auth-method-tabs {
+        @apply mb-5 grid grid-cols-2 gap-1 rounded-2xl border border-slate-200 bg-slate-50 p-1;
+    }
+
+    .auth-method-tab {
+        @apply inline-flex min-h-10 items-center justify-center rounded-xl px-3 text-sm font-medium text-slate-500 transition duration-200 hover:text-slate-800;
+    }
+
+    .auth-method-tab-active {
+        @apply bg-white text-slate-900 shadow-sm ring-1 ring-slate-200;
+    }
+
     .auth-submit {
         @apply mt-1 min-h-11 cursor-pointer;
     }

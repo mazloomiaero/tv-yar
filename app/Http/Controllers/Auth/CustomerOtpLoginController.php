@@ -24,19 +24,24 @@ class CustomerOtpLoginController extends Controller
     {
         $mobile = $request->validated('mobile');
 
-        $sendCustomerOtp->execute($mobile);
+        if (! $sendCustomerOtp->execute($mobile)) {
+            return redirect()
+                ->route('customer.login.otp.form')
+                ->withInput()
+                ->withErrors(['mobile' => 'این شماره ثبت نمی‌باشد.']);
+        }
 
         $request->session()->put('customer_otp_mobile', $mobile);
 
         return redirect()
             ->route('customer.login.verify')
-            ->with('status', __('If an account exists for this mobile number, a login code was sent.'));
+            ->with('status', 'کد ورود ارسال شد.');
     }
 
     public function showVerify(Request $request): View|RedirectResponse
     {
         if (! $request->session()->has('customer_otp_mobile')) {
-            return redirect()->route('customer.login');
+            return redirect()->route('customer.login.otp.form');
         }
 
         return view('auth.customer-otp-verify');
@@ -47,7 +52,7 @@ class CustomerOtpLoginController extends Controller
         $mobile = $request->session()->get('customer_otp_mobile');
 
         if (! is_string($mobile) || $mobile === '') {
-            return redirect()->route('customer.login');
+            return redirect()->route('customer.login.otp.form');
         }
 
         $verifyCustomerOtp->execute($mobile, $request->validated('otp'));

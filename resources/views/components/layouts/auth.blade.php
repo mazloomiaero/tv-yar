@@ -3,7 +3,8 @@
     if (\Illuminate\Support\Facades\Schema::hasTable('company')) {
         $brandCompany = \App\Models\Company::query()->first();
     }
-    $productName = 'سامانه مدیریت خدمات فنی';
+    $branding = app(\App\Support\AuthBrandingStore::class)->resolved();
+    $productName = $branding['title'];
     $brandName = filled($brandCompany?->name) ? $brandCompany->name : $productName;
     $primary = filled($brandCompany?->primary_color) ? $brandCompany->primary_color : '#2563eb';
     $secondary = filled($brandCompany?->secondary_color) ? $brandCompany->secondary_color : '#0b1b3a';
@@ -41,18 +42,16 @@
                             class="h-14 w-14 rounded-2xl object-cover ring-1 ring-white/20"
                         >
                     @else
-                        <span class="auth-logo-fallback" aria-hidden="true">ف</span>
+                        <span class="auth-logo-fallback" aria-hidden="true">{{ mb_substr($brandName, 0, 1) }}</span>
                     @endif
                 </div>
 
-                <p class="auth-kicker">سامانه سازمانی</p>
+                <p class="auth-kicker">{{ $branding['kicker'] }}</p>
                 <h1 class="auth-brand-title">{{ $productName }}</h1>
                 @if ($brandName !== $productName)
                     <p class="auth-brand-company">{{ $brandName }}</p>
                 @endif
-                <p class="auth-brand-lead">
-                    مدیریت درخواست خدمت، ارجاع تکنسین، گزارش تعمیر، فاکتور و پرداخت در یک جریان امن و یکپارچه.
-                </p>
+                <p class="auth-brand-lead">{{ $branding['lead'] }}</p>
 
                 <ul class="auth-trust-list">
                     <li>
@@ -60,20 +59,20 @@
                             <path d="M12 3 4.5 6.5v5.2c0 4.4 3.2 8.4 7.5 9.3 4.3-.9 7.5-4.9 7.5-9.3V6.5L12 3Z" />
                             <path d="m9 12 2 2 4-4" />
                         </svg>
-                        <span>ورود امن با نشست محافظت‌شده</span>
+                        <span>{{ $branding['trust_1'] }}</span>
                     </li>
                     <li>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                             <path d="M4 7h16M4 12h10M4 17h7" />
                         </svg>
-                        <span>پیگیری شفاف وضعیت خدمت</span>
+                        <span>{{ $branding['trust_2'] }}</span>
                     </li>
                     <li>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                             <rect x="5" y="11" width="14" height="10" rx="2" />
                             <path d="M8 11V8a4 4 0 0 1 8 0v3" />
                         </svg>
-                        <span>حفاظت از داده و تاریخچه عملیات</span>
+                        <span>{{ $branding['trust_3'] }}</span>
                     </li>
                 </ul>
             </div>

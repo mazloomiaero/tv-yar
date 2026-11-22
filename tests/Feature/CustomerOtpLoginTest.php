@@ -33,7 +33,9 @@ class CustomerOtpLoginTest extends TestCase
     {
         $this->post(route('customer.login.otp'), [
             'mobile' => '09129999999',
-        ])->assertRedirect(route('customer.login.verify'));
+        ])
+            ->assertRedirect(route('customer.login.otp.form'))
+            ->assertSessionHasErrors(['mobile' => 'این شماره ثبت نمی‌باشد.']);
 
         $this->assertFalse(Cache::has(app(CustomerOtpStore::class)->key('09129999999')));
     }
@@ -97,12 +99,23 @@ class CustomerOtpLoginTest extends TestCase
         foreach (range(1, 5) as $attempt) {
             $this->post(route('customer.login.otp'), [
                 'mobile' => '09125555555',
-            ])->assertRedirect(route('customer.login.verify'));
+            ])->assertRedirect(route('customer.login.otp.form'));
         }
 
         $this->post(route('customer.login.otp'), [
             'mobile' => '09125555555',
         ])->assertStatus(429);
+    }
+
+    public function test_sending_otp_for_known_mobile_shows_sent_status(): void
+    {
+        $customer = Customer::factory()->create(['mobile' => '09126667777']);
+
+        $this->post(route('customer.login.otp'), [
+            'mobile' => $customer->mobile,
+        ])
+            ->assertRedirect(route('customer.login.verify'))
+            ->assertSessionHas('status', 'کد ورود ارسال شد.');
     }
 
     private function putOtp(string $mobile, string $plain): void

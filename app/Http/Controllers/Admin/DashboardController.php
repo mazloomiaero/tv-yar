@@ -6,11 +6,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\ReportService;
+use App\Services\Sms\FarazSmsClient;
+use App\Support\FarazSmsCredentialsStore;
 use Illuminate\Contracts\View\View;
 
 class DashboardController extends Controller
 {
-    public function __invoke(ReportService $reports): View
+    public function __invoke(ReportService $reports, FarazSmsClient $sms, FarazSmsCredentialsStore $smsCredentials): View
     {
         return view('admin.dashboard', [
             'title' => 'Admin',
@@ -23,6 +25,8 @@ class DashboardController extends Controller
             'requestDailyCounts' => $reports->requestDailyCounts(30),
             'recentFeedbacks' => $reports->recentFeedbacks(5),
             'recentEvents' => $reports->recentDashboardEvents(6),
+            'smsCredit' => $sms->credit(),
+            'smsApiConfigured' => $smsCredentials->hasApiKey(),
         ]);
     }
 }

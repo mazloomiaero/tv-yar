@@ -23,6 +23,9 @@
         <x-nav-link :href="route('admin.branches.index')" :active="request()->routeIs('admin.branches.*')">شعب</x-nav-link>
         <x-nav-link :href="route('admin.technicians.index')" :active="request()->routeIs('admin.technicians.*')">تکنسین‌ها</x-nav-link>
         <x-nav-link :href="route('admin.parts.index')" :active="request()->routeIs('admin.parts.*')">کاتالوگ قطعات</x-nav-link>
+        <x-nav-link :href="route('admin.sms-settings.edit')" :active="request()->routeIs('admin.sms-settings.*')">تنظیمات پیامک</x-nav-link>
+        <x-nav-link :href="route('admin.auth-branding.edit')" :active="request()->routeIs('admin.auth-branding.*')">متن صفحه ورود</x-nav-link>
+        <x-nav-link :href="route('admin.website-intake.edit')" :active="request()->routeIs('admin.website-intake.*')">API فرم وب‌سایت</x-nav-link>
     </x-slot:nav>
 
     @yield('content')

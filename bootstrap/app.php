@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Middleware\AddSecurityHeaders;
+use App\Http\Middleware\EnsureIntakeApiKey;
 use App\Http\Middleware\EnsurePanelAccess;
 use App\Http\Middleware\EnsurePermission;
 use App\Models\User;
@@ -51,6 +52,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->prefix('customer')
                 ->name('customer.')
                 ->group(base_path('routes/customer.php'));
+
+            Route::middleware('api')
+                ->prefix('intake')
+                ->name('intake.')
+                ->group(base_path('routes/intake.php'));
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
@@ -59,6 +65,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'panel' => EnsurePanelAccess::class,
             'permission' => EnsurePermission::class,
+            'intake.key' => EnsureIntakeApiKey::class,
         ]);
 
         $middleware->redirectGuestsTo(function (Request $request): string {

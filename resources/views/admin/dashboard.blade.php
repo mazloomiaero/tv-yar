@@ -103,6 +103,23 @@
         <x-dashboard.metric label="میانگین رضایت" :value="$avgScore !== null ? $avgScore : '—'" icon="purple" :progress="$avgScore !== null ? min(100, (int) round(($avgScore / 5) * 100)) : 12" bar="purple" tone="soft">
             <x-slot:hint>{{ $feedbackCount }} بازخورد ثبت‌شده</x-slot:hint>
         </x-dashboard.metric>
+        <x-dashboard.metric
+            label="اعتبار پیامک"
+            :value="$smsCredit !== null ? number_format($smsCredit) : '—'"
+            icon="blue"
+            :progress="$smsCredit !== null ? 70 : 12"
+            tone="brand"
+        >
+            <x-slot:hint>
+                @if ($smsCredit !== null)
+                    موجودی FarazSMS
+                @elseif ($smsApiConfigured)
+                    دریافت اعتبار ناموفق
+                @else
+                    <a href="{{ route('admin.sms-settings.edit') }}" class="underline decoration-slate-300 underline-offset-2 hover:decoration-slate-500">پیکربندی API</a>
+                @endif
+            </x-slot:hint>
+        </x-dashboard.metric>
     </div>
 
     <div class="dash-charts">

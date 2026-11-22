@@ -1,23 +1,69 @@
 <x-layouts.auth title="ورود مشتری">
-    <h2 class="mb-1 text-base font-semibold text-slate-900">ورود مشتری</h2>
-    <p class="mb-5 text-sm text-slate-500">با نام کاربری و رمز عبور وارد شوید. نمونه: test / test</p>
+    <div class="auth-form-header">
+        <span class="auth-form-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <rect x="5" y="11" width="14" height="10" rx="2" />
+                <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+            </svg>
+            پنل مشتری
+        </span>
+        <h2 class="auth-form-title">ورود مشتری</h2>
+        <p class="auth-form-subtitle">با نام کاربری و رمز عبور وارد شوید.</p>
+    </div>
+
+    <x-auth-method-tabs panel="customer" active="password" />
 
     <x-flash />
 
-    <form method="POST" action="{{ route('customer.login.store') }}" class="space-y-4">
+    <form method="POST" action="{{ route('customer.login.store') }}" class="auth-form" novalidate>
         @csrf
         <div>
             <label for="username" class="ui-label">نام کاربری</label>
-            <input id="username" type="text" name="username" value="{{ old('username') }}" required autofocus class="ui-input" autocomplete="username">
+            <input
+                id="username"
+                type="text"
+                name="username"
+                value="{{ old('username') }}"
+                required
+                autofocus
+                class="ui-input @error('username') border-red-500 @enderror"
+                autocomplete="username"
+                aria-invalid="{{ $errors->has('username') ? 'true' : 'false' }}"
+                @error('username') aria-describedby="username-error" @enderror
+            >
+            @error('username')
+                <p id="username-error" class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
+            @enderror
         </div>
         <div>
             <label for="password" class="ui-label">رمز عبور</label>
-            <input id="password" type="password" name="password" required class="ui-input" autocomplete="current-password">
+            <div class="ui-password">
+                <input
+                    id="password"
+                    type="password"
+                    name="password"
+                    required
+                    class="ui-input @error('password') border-red-500 @enderror"
+                    autocomplete="current-password"
+                    aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}"
+                    @error('password') aria-describedby="password-error" @enderror
+                >
+                <button
+                    type="button"
+                    class="ui-password-toggle"
+                    data-password-toggle
+                    aria-label="نمایش رمز عبور"
+                >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
+                        <circle cx="12" cy="12" r="3" />
+                    </svg>
+                </button>
+            </div>
+            @error('password')
+                <p id="password-error" class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
+            @enderror
         </div>
-        <x-button class="w-full">ورود</x-button>
+        <x-button class="auth-submit w-full">ورود به پنل مشتری</x-button>
     </form>
-
-    <p class="mt-4 text-center text-sm text-slate-500">
-        <a class="ui-link" href="{{ route('customer.login.otp.form') }}">ورود با کد یک‌بارمصرف</a>
-    </p>
 </x-layouts.auth>

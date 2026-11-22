@@ -11,6 +11,8 @@
         <p class="auth-form-subtitle">با نام کاربری و رمز عبور وارد شوید.</p>
     </div>
 
+    <x-auth-method-tabs panel="staff" active="password" />
+
     <x-flash />
 
     <form method="POST" action="{{ route('login.store') }}" class="auth-form" novalidate>

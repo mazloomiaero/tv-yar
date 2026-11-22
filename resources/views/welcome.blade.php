@@ -14,7 +14,7 @@
             <p class="mt-2 text-sm text-slate-500">مدیریت درخواست خدمت، ارجاع تکنسین، گزارش، فاکتور و پرداخت</p>
             <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
                 <x-button href="{{ route('login') }}">ورود کارکنان</x-button>
-                <x-button variant="secondary" href="{{ route('customer.login') }}">ورود مشتری</x-button>
+                <x-button variant="secondary" href="{{ route('customer.login.otp.form') }}">ورود مشتری</x-button>
             </div>
         </div>
     </div>

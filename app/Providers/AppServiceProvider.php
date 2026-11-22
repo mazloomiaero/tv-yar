@@ -85,9 +85,21 @@ class AppServiceProvider extends ServiceProvider
             );
         });
 
+        RateLimiter::for('internal-otp', function (Request $request) {
+            return Limit::perMinute(5)->by(
+                (string) $request->input('mobile').'|'.$request->ip()
+            );
+        });
+
         RateLimiter::for('customer-otp', function (Request $request) {
             return Limit::perMinute(5)->by(
                 (string) $request->input('mobile').'|'.$request->ip()
+            );
+        });
+
+        RateLimiter::for('website-intake', function (Request $request) {
+            return Limit::perMinute(30)->by(
+                (string) $request->header('X-Intake-Key', '').'|'.$request->ip()
             );
         });
 

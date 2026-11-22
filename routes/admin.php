@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Admin\AuthBrandingController;
 use App\Http\Controllers\Admin\BranchController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CustomFieldController;
@@ -11,11 +12,24 @@ use App\Http\Controllers\Admin\PartController;
 use App\Http\Controllers\Admin\ServiceStatusController;
 use App\Http\Controllers\Admin\ServiceTypeController;
 use App\Http\Controllers\Admin\SkillController;
+use App\Http\Controllers\Admin\SmsSettingsController;
 use App\Http\Controllers\Admin\StaffUserController;
 use App\Http\Controllers\Admin\TechnicianController;
+use App\Http\Controllers\Admin\WebsiteIntakeSettingsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', DashboardController::class)->name('dashboard');
+
+Route::get('/sms-settings', [SmsSettingsController::class, 'edit'])->name('sms-settings.edit');
+Route::put('/sms-settings', [SmsSettingsController::class, 'update'])->name('sms-settings.update');
+
+Route::get('/auth-branding', [AuthBrandingController::class, 'edit'])->name('auth-branding.edit');
+Route::put('/auth-branding', [AuthBrandingController::class, 'update'])->name('auth-branding.update');
+
+Route::get('/website-intake', [WebsiteIntakeSettingsController::class, 'edit'])->name('website-intake.edit');
+Route::put('/website-intake', [WebsiteIntakeSettingsController::class, 'update'])->name('website-intake.update');
+Route::post('/website-intake/keys', [WebsiteIntakeSettingsController::class, 'storeKey'])->name('website-intake.keys.store');
+Route::delete('/website-intake/keys/{keyId}', [WebsiteIntakeSettingsController::class, 'destroyKey'])->name('website-intake.keys.destroy');
 
 Route::middleware('throttle:admin-catalog')->group(function (): void {
     Route::get('/staff', [StaffUserController::class, 'index'])->name('staff.index');
