@@ -571,6 +571,11 @@
         @apply hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md;
     }
 
+    a.dash-metric--link {
+        @apply no-underline text-inherit;
+        cursor: pointer;
+    }
+
     .dash-metric--brand {
         border-inline-start-width: 4px;
         border-inline-start-color: var(--color-brand);

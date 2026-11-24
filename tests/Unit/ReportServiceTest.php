@@ -46,6 +46,28 @@ class ReportServiceTest extends TestCase
         $this->assertSame(1, $counts['not_suggested']);
     }
 
+    public function test_it_counts_only_open_assignments_when_requested(): void
+    {
+        ServiceAssignment::factory()->create([
+            'is_suggested' => true,
+            'completed_at' => null,
+        ]);
+        ServiceAssignment::factory()->create([
+            'is_suggested' => false,
+            'completed_at' => null,
+        ]);
+        ServiceAssignment::factory()->create([
+            'is_suggested' => true,
+            'completed_at' => now(),
+        ]);
+
+        $counts = (new ReportService)->assignmentSuggestionCounts(onlyOpen: true);
+
+        $this->assertSame(2, $counts['total']);
+        $this->assertSame(1, $counts['suggested']);
+        $this->assertSame(1, $counts['not_suggested']);
+    }
+
     public function test_financial_report_aggregates_invoice_status_and_payment_method_amounts(): void
     {
         $paid = Invoice::factory()->create([

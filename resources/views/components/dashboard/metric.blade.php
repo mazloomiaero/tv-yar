@@ -5,6 +5,7 @@
     'icon' => null,
     'progress' => null,
     'bar' => 'blue',
+    'href' => null,
 ])
 
 @php
@@ -32,9 +33,10 @@
     };
 
     $progressValue = is_numeric($progress) ? max(0, min(100, (float) $progress)) : null;
+    $tag = filled($href) ? 'a' : 'article';
 @endphp
 
-<article {{ $attributes->class(['dash-metric', $toneClass]) }}>
+<{{ $tag }} {{ $attributes->class(['dash-metric', $toneClass, filled($href) ? 'dash-metric--link' : null])->merge(filled($href) ? ['href' => $href] : []) }}>
     <div class="dash-metric__top">
         <div class="min-w-0">
             <p class="dash-metric__label">{{ $label }}</p>
@@ -66,4 +68,4 @@
     @isset($hint)
         <p class="dash-metric__hint">{{ $hint }}</p>
     @endisset
-</article>
+</{{ $tag }}>

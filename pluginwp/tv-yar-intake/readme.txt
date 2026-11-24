@@ -3,7 +3,7 @@ Contributors: tvyar
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.0
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 
 فرم ثبت درخواست خدمت با شرت‌کد [tv_yar_intake] و اتصال یک‌طرفه به سامانه مدیریت خدمات فنی.

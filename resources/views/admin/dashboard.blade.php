@@ -94,7 +94,15 @@
         <x-dashboard.metric label="درخواست‌های امروز" :value="$todayRequests" icon="blue" :progress="$todayRequests > 0 ? min(100, 30 + $todayRequests * 12) : 10" tone="brand">
             <x-slot:hint>ثبت‌شده در تاریخ جاری</x-slot:hint>
         </x-dashboard.metric>
-        <x-dashboard.metric label="ارجاع‌های فعال" :value="$openAssignments" icon="orange" :progress="$openAssignments > 0 ? min(100, 25 + $openAssignments * 8) : 10" bar="orange" tone="warn">
+        <x-dashboard.metric
+            label="ارجاع‌های فعال"
+            :value="$openAssignments"
+            icon="orange"
+            :progress="$openAssignments > 0 ? min(100, 25 + $openAssignments * 8) : 10"
+            bar="orange"
+            tone="warn"
+            :href="route('admin.service-requests.index')"
+        >
             <x-slot:hint>پیشنهادی {{ $assignmentSuggestionCounts['suggested'] }} · دستی {{ $assignmentSuggestionCounts['not_suggested'] }}</x-slot:hint>
         </x-dashboard.metric>
         <x-dashboard.metric label="فاکتورهای پرداخت‌شده" :value="$paidInvoices" icon="green" :progress="$paidProgress" bar="green" tone="ok">

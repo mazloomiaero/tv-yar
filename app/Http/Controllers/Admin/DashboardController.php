@@ -18,7 +18,7 @@ class DashboardController extends Controller
             'title' => 'Admin',
             'entityCounts' => $reports->entityCounts(),
             'requestCountsBySource' => $reports->requestCountsBySource(),
-            'assignmentSuggestionCounts' => $reports->assignmentSuggestionCounts(),
+            'assignmentSuggestionCounts' => $reports->assignmentSuggestionCounts(onlyOpen: true),
             'invoiceCountsByStatus' => $reports->invoiceCountsByStatus(),
             'paymentCountsByMethod' => $reports->paymentCountsByMethod(),
             'requestCountsByStatus' => $reports->requestCountsByStatusName(),

@@ -8,13 +8,17 @@
   }
 
   ready(function () {
+    var root = document.querySelector('[data-tv-yar-intake]');
     var form = document.querySelector('[data-tv-yar-intake-form]');
-    if (!form || typeof tvYarIntake === 'undefined') {
+    if (!root || !form || typeof tvYarIntake === 'undefined') {
       return;
     }
 
-    var message = form.querySelector('[data-tv-yar-intake-message]');
+    var message = root.querySelector('[data-tv-yar-intake-message]');
     var submit = form.querySelector('.tv-yar-intake__submit');
+    var successPanel = root.querySelector('[data-tv-yar-intake-success]');
+    var successText = root.querySelector('[data-tv-yar-intake-success-text]');
+    var header = root.querySelector('[data-tv-yar-intake-header]');
 
     form.addEventListener('submit', function (event) {
       event.preventDefault();
@@ -51,12 +55,25 @@
           });
         })
         .then(function (result) {
-          message.hidden = false;
-          message.textContent = result.data.message || (result.ok ? 'ثبت شد.' : 'خطا در ثبت.');
-          message.classList.add(result.ok ? 'is-success' : 'is-error');
           if (result.ok) {
-            form.reset();
+            form.hidden = true;
+            if (header) {
+              header.hidden = true;
+            }
+            if (successPanel && successText) {
+              successText.textContent = result.data.message || 'درخواست شما ثبت شد.';
+              successPanel.hidden = false;
+            } else {
+              message.hidden = false;
+              message.textContent = result.data.message || 'درخواست شما ثبت شد.';
+              message.classList.add('is-success');
+            }
+            return;
           }
+
+          message.hidden = false;
+          message.textContent = result.data.message || 'خطا در ثبت.';
+          message.classList.add('is-error');
         })
         .catch(function () {
           message.hidden = false;
@@ -64,8 +81,10 @@
           message.classList.add('is-error');
         })
         .finally(function () {
-          submit.disabled = false;
-          submit.textContent = submit.dataset.originalLabel || 'ثبت درخواست';
+          if (!form.hidden) {
+            submit.disabled = false;
+            submit.textContent = submit.dataset.originalLabel || 'ثبت درخواست';
+          }
         });
     });
   });

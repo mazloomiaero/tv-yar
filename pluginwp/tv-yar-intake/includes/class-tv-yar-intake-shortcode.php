@@ -103,9 +103,15 @@ final class Tv_Yar_Intake_Shortcode
         $brands = Tv_Yar_Intake_Settings::brands();
         ob_start();
         ?>
-        <div class="tv-yar-intake" dir="rtl">
+        <div class="tv-yar-intake" dir="rtl" data-tv-yar-intake>
             <div class="tv-yar-intake__shell">
-                <div class="tv-yar-intake__header">
+                <div class="tv-yar-intake__success" data-tv-yar-intake-success hidden>
+                    <div class="tv-yar-intake__success-icon" aria-hidden="true">✓</div>
+                    <h3 class="tv-yar-intake__success-title">ثبت شد</h3>
+                    <p class="tv-yar-intake__success-text" data-tv-yar-intake-success-text>درخواست شما ثبت شد.</p>
+                </div>
+
+                <div class="tv-yar-intake__header" data-tv-yar-intake-header>
                     <p class="tv-yar-intake__eyebrow">TV Yar</p>
                     <h3 class="tv-yar-intake__title">ثبت درخواست تعمیر تلویزیون</h3>
                     <p class="tv-yar-intake__subtitle">نام، موبایل، برند و شرح ایراد را وارد کنید. آدرس اختیاری است.</p>

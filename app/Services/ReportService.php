@@ -78,10 +78,13 @@ class ReportService
      *
      * @return array{total: int, suggested: int, not_suggested: int}
      */
-    public function assignmentSuggestionCounts(): array
+    public function assignmentSuggestionCounts(bool $onlyOpen = false): array
     {
-        $total = ServiceAssignment::query()->count();
-        $suggested = ServiceAssignment::query()->where('is_suggested', true)->count();
+        $base = ServiceAssignment::query()
+            ->when($onlyOpen, fn ($query) => $query->whereNull('completed_at'));
+
+        $total = (clone $base)->count();
+        $suggested = (clone $base)->where('is_suggested', true)->count();
 
         return [
             'total' => $total,

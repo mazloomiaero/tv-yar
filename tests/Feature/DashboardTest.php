@@ -33,14 +33,25 @@ class DashboardTest extends TestCase
     {
         ServiceRequest::factory()->create(['source' => ServiceRequestSource::Website->value]);
         Invoice::factory()->create(['status' => InvoiceStatus::Paid->value]);
+        ServiceAssignment::factory()->create([
+            'is_suggested' => false,
+            'completed_at' => null,
+        ]);
+        ServiceAssignment::factory()->create([
+            'is_suggested' => true,
+            'completed_at' => now(),
+        ]);
 
         $admin = $this->staffUser(RoleName::CompanyAdmin);
 
         $this->actingAs($admin)
             ->get(route('admin.dashboard'))
             ->assertOk()
-            ->assertSee('website: 1')
-            ->assertSee('paid: 1')
+            ->assertSee('وب‌سایت')
+            ->assertSee('پرداخت‌شده')
+            ->assertSee('ارجاع‌های فعال')
+            ->assertSee('پیشنهادی 0 · دستی 1')
+            ->assertSee('/admin/service-requests', false)
             ->assertDontSee('SLA')
             ->assertDontSee('GPS');
     }

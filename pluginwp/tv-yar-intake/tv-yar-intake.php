@@ -3,7 +3,7 @@
 /**
  * Plugin Name: TV Yar Intake Form
  * Description: شرت‌کد فرم ثبت درخواست خدمت برای اتصال یک‌طرفه به سامانه مدیریت خدمات فنی.
- * Version: 1.1.0
+ * Version: 1.1.1
  * Author: TV Yar
  * Text Domain: tv-yar-intake
  */
@@ -14,7 +14,7 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
-define('TV_YAR_INTAKE_VERSION', '1.1.0');
+define('TV_YAR_INTAKE_VERSION', '1.1.1');
 define('TV_YAR_INTAKE_FILE', __FILE__);
 define('TV_YAR_INTAKE_PATH', plugin_dir_path(__FILE__));
 define('TV_YAR_INTAKE_URL', plugin_dir_url(__FILE__));

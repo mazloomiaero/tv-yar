@@ -221,6 +221,45 @@
   border: 1px solid #fecdd3;
 }
 
+.tv-yar-intake__success {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 40px 24px;
+  text-align: center;
+}
+
+.tv-yar-intake__success[hidden] {
+  display: none;
+}
+
+.tv-yar-intake__success-icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #047857;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+}
+
+.tv-yar-intake__success-title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.tv-yar-intake__success-text {
+  margin: 0;
+  max-width: 28rem;
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--tv-muted);
+}
+
 @media (max-width: 640px) {
   .tv-yar-intake {
     padding: 0;
