@@ -51,6 +51,7 @@ class DashboardTest extends TestCase
             ->assertSee('پرداخت‌شده')
             ->assertSee('ارجاع‌های فعال')
             ->assertSee('پیشنهادی 0 · دستی 1')
+            ->assertSee('/admin/service-requests?created=today', false)
             ->assertSee('/admin/service-requests', false)
             ->assertDontSee('SLA')
             ->assertDontSee('GPS');

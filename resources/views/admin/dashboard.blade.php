@@ -91,7 +91,14 @@
     </x-dashboard.hero>
 
     <div class="dash-metric-grid mb-5">
-        <x-dashboard.metric label="درخواست‌های امروز" :value="$todayRequests" icon="blue" :progress="$todayRequests > 0 ? min(100, 30 + $todayRequests * 12) : 10" tone="brand">
+        <x-dashboard.metric
+            label="درخواست‌های امروز"
+            :value="$todayRequests"
+            icon="blue"
+            :progress="$todayRequests > 0 ? min(100, 30 + $todayRequests * 12) : 10"
+            tone="brand"
+            :href="route('admin.service-requests.index', ['created' => 'today'])"
+        >
             <x-slot:hint>ثبت‌شده در تاریخ جاری</x-slot:hint>
         </x-dashboard.metric>
         <x-dashboard.metric

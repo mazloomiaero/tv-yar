@@ -18,6 +18,7 @@ use App\Models\ServiceRequest;
 use App\Models\ServiceStatus;
 use App\Models\ServiceType;
 use App\Models\User;
+use App\Support\CancelledServiceStatus;
 use App\Support\InitialServiceStatus;
 use App\Support\PermissionName;
 use App\Support\RoleName;
@@ -331,6 +332,64 @@ class ServiceRequestTest extends TestCase
             ServiceRequestClosed::class,
             fn (ServiceRequestClosed $event): bool => $event->serviceRequestId === $serviceRequest->id,
         );
+    }
+
+    public function test_operator_can_cancel_a_request_from_the_list_without_deleting_it(): void
+    {
+        Event::fake([ServiceStatusChanged::class, ServiceRequestClosed::class]);
+
+        $operator = $this->staffUser(RoleName::Operator);
+        $context = $this->readyContext();
+        $cancelled = ServiceStatus::factory()->create([
+            'name' => CancelledServiceStatus::NAME,
+            'code' => CancelledServiceStatus::CODE,
+        ]);
+        $context['serviceType']->statuses()->syncWithoutDetaching([$cancelled->id]);
+
+        $this->actingAs($operator)
+            ->post(
+                route('operator.customers.service-requests.store', $context['customer']),
+                $this->requestPayload($context),
+            );
+
+        $serviceRequest = ServiceRequest::query()->firstOrFail();
+
+        $this->actingAs($operator)
+            ->post(route('operator.service-requests.cancel', $serviceRequest))
+            ->assertRedirect(route('operator.service-requests.index'))
+            ->assertSessionHas('status', 'درخواست لغو شد.');
+
+        $serviceRequest->refresh();
+
+        $this->assertSame(CancelledServiceStatus::CODE, $serviceRequest->status?->code);
+        $this->assertNotNull($serviceRequest->closed_at);
+        $this->assertNotNull(ServiceRequest::query()->find($serviceRequest->id));
+        Event::assertDispatched(ServiceStatusChanged::class);
+        Event::assertDispatched(ServiceRequestClosed::class);
+    }
+
+    public function test_service_request_index_can_filter_created_today(): void
+    {
+        $operator = $this->staffUser(RoleName::Operator);
+        $context = $this->readyContext();
+
+        $this->actingAs($operator)
+            ->post(
+                route('operator.customers.service-requests.store', $context['customer']),
+                $this->requestPayload($context),
+            );
+
+        $todayRequest = ServiceRequest::query()->firstOrFail();
+        $oldRequest = ServiceRequest::factory()->create([
+            'created_at' => now()->subDay(),
+        ]);
+
+        $this->actingAs($operator)
+            ->get(route('operator.service-requests.index', ['created' => 'today']))
+            ->assertOk()
+            ->assertSee($todayRequest->request_number)
+            ->assertDontSee($oldRequest->request_number)
+            ->assertSee('فقط درخواست‌های ثبت‌شده امروز.');
     }
 
     public function test_closing_an_already_closed_request_fails(): void

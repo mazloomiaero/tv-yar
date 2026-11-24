@@ -9,6 +9,7 @@ use App\Actions\ServiceRequest\CloseServiceRequest;
 use App\Actions\ServiceRequest\CreateServiceRequest;
 use App\Actions\ServiceRequest\SuggestTechnician;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Operator\CancelServiceRequestRequest;
 use App\Http\Requests\Operator\ChangeServiceStatusRequest;
 use App\Http\Requests\Operator\CloseServiceRequestRequest;
 use App\Http\Requests\Operator\StoreServiceRequestRequest;
@@ -20,28 +21,39 @@ use App\Models\ServiceStatus;
 use App\Models\Technician;
 use App\Models\User;
 use App\Services\CustomField\CustomFieldService;
+use App\Support\CancelledServiceStatus;
 use App\Support\OpsRoute;
 use App\Support\ServiceRequestSource;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use InvalidArgumentException;
+use RuntimeException;
 
 class ServiceRequestController extends Controller
 {
     use AuthorizesRequests;
 
-    public function index(): View
+    public function index(Request $request): View
     {
         $this->authorize('viewAny', ServiceRequest::class);
 
+        $createdFilter = (string) $request->query('created', '');
+
         $serviceRequests = ServiceRequest::query()
             ->with(['customer', 'device', 'serviceType', 'status'])
+            ->when(
+                $createdFilter === 'today',
+                fn ($query) => $query->whereDate('created_at', now()->toDateString()),
+            )
             ->orderByDesc('id')
             ->get();
 
         return view('operator.service-requests.index', [
             'title' => 'Service requests',
             'serviceRequests' => $serviceRequests,
+            'createdFilter' => $createdFilter,
         ]);
     }
 
@@ -163,6 +175,44 @@ class ServiceRequestController extends Controller
         return redirect()
             ->route(OpsRoute::name('service-requests.show'), $serviceRequest)
             ->with('status', 'Service request closed.');
+    }
+
+    public function cancel(
+        CancelServiceRequestRequest $request,
+        ServiceRequest $serviceRequest,
+        ChangeServiceStatus $changeServiceStatus,
+        CloseServiceRequest $closeServiceRequest,
+    ): RedirectResponse {
+        $operator = $request->user('web');
+        if (! $operator instanceof User) {
+            abort(403);
+        }
+
+        $status = ServiceStatus::findByCode(CancelledServiceStatus::CODE);
+
+        if (! $status instanceof ServiceStatus) {
+            throw new RuntimeException(
+                'Seeded status ['.CancelledServiceStatus::CODE.'] is missing.',
+            );
+        }
+
+        try {
+            $changeServiceStatus->execute($serviceRequest, $status, $operator);
+        } catch (InvalidArgumentException) {
+            return redirect()
+                ->route(OpsRoute::name('service-requests.index'))
+                ->withErrors(['service_request' => 'وضعیت لغو برای این نوع خدمت تعریف نشده است.']);
+        }
+
+        $serviceRequest->refresh();
+
+        if (! $serviceRequest->isClosed()) {
+            $closeServiceRequest->execute($serviceRequest);
+        }
+
+        return redirect()
+            ->route(OpsRoute::name('service-requests.index'))
+            ->with('status', 'درخواست لغو شد.');
     }
 
     /**

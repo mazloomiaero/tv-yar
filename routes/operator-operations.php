@@ -61,6 +61,9 @@ Route::middleware('throttle:operator-requests')->group(function (): void {
     Route::post('/service-requests/{serviceRequest}/close', [ServiceRequestController::class, 'close'])
         ->middleware('permission:requests.close')
         ->name('service-requests.close');
+    Route::post('/service-requests/{serviceRequest}/cancel', [ServiceRequestController::class, 'cancel'])
+        ->middleware('permission:requests.change_status')
+        ->name('service-requests.cancel');
     Route::get('/customers/{customer}/service-requests/create', [ServiceRequestController::class, 'create'])
         ->middleware('permission:requests.create')
         ->name('customers.service-requests.create');
