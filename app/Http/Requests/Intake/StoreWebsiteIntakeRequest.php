@@ -23,7 +23,7 @@ class StoreWebsiteIntakeRequest extends FormRequest
             'mobile' => ['required', 'string', 'regex:/^09\d{9}$/'],
             'brand' => ['required', 'string', 'max:150'],
             'problem' => ['required', 'string', 'max:5000'],
-            'address' => ['required', 'string', 'max:1000'],
+            'address' => ['nullable', 'string', 'max:1000'],
         ];
     }
 
@@ -38,7 +38,6 @@ class StoreWebsiteIntakeRequest extends FormRequest
             'mobile.regex' => 'شماره همراه باید با ۰۹ و ۱۱ رقم باشد.',
             'brand.required' => 'برند دستگاه الزامی است.',
             'problem.required' => 'شرح ایراد الزامی است.',
-            'address.required' => 'آدرس الزامی است.',
         ];
     }
 }

@@ -32,7 +32,7 @@ final class CreateWebsiteIntake
      *     mobile: string,
      *     brand: string,
      *     problem: string,
-     *     address: string
+     *     address?: string|null
      * }  $payload
      */
     public function execute(array $payload): ServiceRequest
@@ -64,7 +64,7 @@ final class CreateWebsiteIntake
                 'notes' => 'ثبت از فرم وب‌سایت',
             ], []);
 
-            $addressNote = trim($payload['address']);
+            $addressNote = trim((string) ($payload['address'] ?? ''));
             $notes = $addressNote !== '' ? 'آدرس: '.$addressNote : '';
 
             return $this->createServiceRequest->execute(

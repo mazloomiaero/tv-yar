@@ -26,6 +26,8 @@
       message.hidden = true;
       message.className = 'tv-yar-intake__message';
       submit.disabled = true;
+      submit.dataset.originalLabel = submit.textContent || '';
+      submit.textContent = 'در حال ثبت...';
 
       var payload = {
         full_name: (form.querySelector('[name="full_name"]') || {}).value || '',
@@ -63,6 +65,7 @@
         })
         .finally(function () {
           submit.disabled = false;
+          submit.textContent = submit.dataset.originalLabel || 'ثبت درخواست';
         });
     });
   });

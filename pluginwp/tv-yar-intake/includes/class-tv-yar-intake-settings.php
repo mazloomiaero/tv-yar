@@ -141,7 +141,7 @@ final class Tv_Yar_Intake_Settings
                                 rows="8"
                                 name="<?php echo esc_attr(self::OPTION_KEY); ?>[brands]"
                             ><?php echo esc_textarea($settings['brands']); ?></textarea>
-                            <p class="description">هر خط یک گزینه برای لیست انتخاب دستگاه.</p>
+                            <p class="description">هر خط یک گزینه برای لیست انتخاب دستگاه. این لیست فقط از همین تنظیمات وردپرس خوانده می‌شود (نه از جدول برند سامانه).</p>
                         </td>
                     </tr>
                     <tr>

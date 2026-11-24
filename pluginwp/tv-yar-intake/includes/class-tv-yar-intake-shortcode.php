@@ -54,7 +54,7 @@ final class Tv_Yar_Intake_Shortcode
         $problem = sanitize_textarea_field((string) $request->get_param('problem'));
         $address = sanitize_textarea_field((string) $request->get_param('address'));
 
-        if ($fullName === '' || $mobile === '' || $brand === '' || $problem === '' || $address === '') {
+        if ($fullName === '' || $mobile === '' || $brand === '' || $problem === '') {
             return new WP_REST_Response([
                 'ok' => false,
                 'message' => 'لطفاً همه فیلدهای الزامی را پر کنید.',
@@ -104,40 +104,53 @@ final class Tv_Yar_Intake_Shortcode
         ob_start();
         ?>
         <div class="tv-yar-intake" dir="rtl">
-            <form class="tv-yar-intake__form" data-tv-yar-intake-form novalidate>
-                <div class="tv-yar-intake__field">
-                    <label for="tv_yar_full_name">نام و نام خانوادگی <span>*</span></label>
-                    <input id="tv_yar_full_name" name="full_name" type="text" required maxlength="200">
+            <div class="tv-yar-intake__shell">
+                <div class="tv-yar-intake__header">
+                    <p class="tv-yar-intake__eyebrow">TV Yar</p>
+                    <h3 class="tv-yar-intake__title">ثبت درخواست تعمیر تلویزیون</h3>
+                    <p class="tv-yar-intake__subtitle">نام، موبایل، برند و شرح ایراد را وارد کنید. آدرس اختیاری است.</p>
                 </div>
 
-                <div class="tv-yar-intake__field">
-                    <label for="tv_yar_mobile">شماره همراه <span>*</span></label>
-                    <input id="tv_yar_mobile" name="mobile" type="tel" required maxlength="11" inputmode="numeric" placeholder="0912xxxxxxx" dir="ltr">
-                </div>
+                <form class="tv-yar-intake__form" data-tv-yar-intake-form novalidate>
+                    <div class="tv-yar-intake__grid">
+                        <div class="tv-yar-intake__field">
+                            <label for="tv_yar_full_name">نام و نام خانوادگی <span>*</span></label>
+                            <input id="tv_yar_full_name" name="full_name" type="text" required maxlength="200" autocomplete="name" placeholder="مثلاً علی رضایی">
+                        </div>
 
-                <div class="tv-yar-intake__field">
-                    <label for="tv_yar_brand">مدل / برند دستگاه <span>*</span></label>
-                    <select id="tv_yar_brand" name="brand" required>
-                        <option value="">انتخاب کنید</option>
-                        <?php foreach ($brands as $brand) { ?>
-                            <option value="<?php echo esc_attr($brand); ?>"><?php echo esc_html($brand); ?></option>
-                        <?php } ?>
-                    </select>
-                </div>
+                        <div class="tv-yar-intake__field">
+                            <label for="tv_yar_mobile">شماره همراه <span>*</span></label>
+                            <input id="tv_yar_mobile" name="mobile" type="tel" required maxlength="11" inputmode="numeric" autocomplete="tel" placeholder="0912xxxxxxx" dir="ltr">
+                        </div>
 
-                <div class="tv-yar-intake__field">
-                    <label for="tv_yar_problem">شرح ایراد <span>*</span></label>
-                    <textarea id="tv_yar_problem" name="problem" rows="4" required maxlength="5000"></textarea>
-                </div>
+                        <div class="tv-yar-intake__field tv-yar-intake__field--full">
+                            <label for="tv_yar_brand">مدل / برند دستگاه <span>*</span></label>
+                            <select id="tv_yar_brand" name="brand" required>
+                                <option value="">انتخاب کنید</option>
+                                <?php foreach ($brands as $brand) { ?>
+                                    <option value="<?php echo esc_attr($brand); ?>"><?php echo esc_html($brand); ?></option>
+                                <?php } ?>
+                            </select>
+                            <p class="tv-yar-intake__hint">لیست برند از تنظیمات پلاگین در وردپرس خوانده می‌شود.</p>
+                        </div>
 
-                <div class="tv-yar-intake__field">
-                    <label for="tv_yar_address">آدرس <span>*</span></label>
-                    <textarea id="tv_yar_address" name="address" rows="3" required maxlength="1000"></textarea>
-                </div>
+                        <div class="tv-yar-intake__field tv-yar-intake__field--full">
+                            <label for="tv_yar_problem">شرح ایراد <span>*</span></label>
+                            <textarea id="tv_yar_problem" name="problem" rows="4" required maxlength="5000" placeholder="مثلاً تصویر ندارد / صدا قطع است"></textarea>
+                        </div>
 
-                <button type="submit" class="tv-yar-intake__submit">ثبت درخواست</button>
-                <p class="tv-yar-intake__message" data-tv-yar-intake-message hidden></p>
-            </form>
+                        <div class="tv-yar-intake__field tv-yar-intake__field--full">
+                            <label for="tv_yar_address">آدرس <small>(اختیاری)</small></label>
+                            <textarea id="tv_yar_address" name="address" rows="3" maxlength="1000" placeholder="اگر مایلید آدرس را بنویسید"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="tv-yar-intake__actions">
+                        <button type="submit" class="tv-yar-intake__submit">ثبت درخواست</button>
+                        <p class="tv-yar-intake__message" data-tv-yar-intake-message hidden></p>
+                    </div>
+                </form>
+            </div>
         </div>
         <?php
 

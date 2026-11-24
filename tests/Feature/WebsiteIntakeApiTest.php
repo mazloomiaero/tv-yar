@@ -121,6 +121,26 @@ class WebsiteIntakeApiTest extends TestCase
         ])->assertUnprocessable();
     }
 
+    public function test_intake_allows_missing_address(): void
+    {
+        $actor = $this->staffUser(RoleName::Operator);
+        $context = $this->configureIntake($actor->id);
+
+        $this->postJson(route('intake.website-request'), [
+            'full_name' => 'سارا محمدی',
+            'mobile' => '09123334455',
+            'brand' => 'Sony',
+            'problem' => 'صفحه سیاه است',
+        ], [
+            'X-Intake-Key' => $context['api_key'],
+        ])->assertCreated();
+
+        $request = ServiceRequest::query()->latest('id')->first();
+        $this->assertNotNull($request);
+        $this->assertSame('صفحه سیاه است', $request->problem_description);
+        $this->assertSame('', trim((string) $request->notes));
+    }
+
     public function test_admin_lists_created_api_keys_with_copy_controls(): void
     {
         $admin = $this->staffUser(RoleName::CompanyAdmin);
