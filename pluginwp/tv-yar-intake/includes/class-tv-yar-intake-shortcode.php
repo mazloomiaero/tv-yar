@@ -131,7 +131,6 @@ final class Tv_Yar_Intake_Shortcode
                                     <option value="<?php echo esc_attr($brand); ?>"><?php echo esc_html($brand); ?></option>
                                 <?php } ?>
                             </select>
-                            <p class="tv-yar-intake__hint">لیست برند از تنظیمات پلاگین در وردپرس خوانده می‌شود.</p>
                         </div>
 
                         <div class="tv-yar-intake__field tv-yar-intake__field--full">
